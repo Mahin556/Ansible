@@ -5,26 +5,38 @@
     - system2
     - localhost
   tasks:
+    ## rsync needs to be installed on all the system
     - name: IS RSYNC INSTALLED?
       yum:
         name: rsync
         state: latest
 
+    # SSH-based transfers using rsync
     - name: PULLING A USER HOME DIRECTORY TO THE SERVER
       synchronize:
-        src: admin@system1:/home
-        dest: /root/Downloads/home
+        src: admin@system1:/home   ## SSH username and hostname/IP
+        dest: /root/Downloads/
         mode: pull
-        rsync_opts:
+        rsync_opts:  ## parameter for SSH
           - "-e ssh"
+          - "--compress" 
+            # - "--delete"
       when: inventory_hostname == 'system1'
 
     - name: PUSHING A USER HOME DIRECTORY TO THE BACKUP-SERVER
       synchronize:
-        src: /root/Downloads/home/
-        dest: admin@system2:/home/
+        src: /root/Downloads/
+        dest: admin@system2:/root/Downloads/
         mode: push
         rsync_opts:
           - "-e ssh"
+          - "--compress"  #To speed up transfers by reducing data size during transfer.
+            # - "--delete" # Ensures synchronization by deleting files on the destination that no longer exist on the source.
       when: inventory_hostname == 'system2'
+
+## Ensure SSH key-based authentication is set up, or use --ask-pass for password-based authentication.
+## If using a custom SSH port (e.g., 2222), modify rsync_opts:
+#  rsync_opts:
+#  - "-e ssh -p 2222 "
+
 

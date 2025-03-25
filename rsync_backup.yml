@@ -3,7 +3,13 @@
   hosts:
     - system1
     - system2
+    - localhost
   tasks:
+    - name: IS RSYNC INSTALLED?
+      yum:
+        name: rsync
+        state: latest
+
     - name: PULLING A USER HOME DIRECTORY TO THE SERVER
       synchronize:
         src: admin@system1:/home

@@ -1,0 +1,24 @@
+---
+- name: TAKING A BACKUP USING RSYNC
+  hosts:
+    - system1
+    - system2
+  tasks:
+    - name: PULLING A USER HOME DIRECTORY TO THE SERVER
+      synchronize:
+        src: admin@system1:/home
+        dest: /root/Downloads/home
+        mode: pull
+        rsync_opts:
+          - "-e ssh"
+      when: inventory_hostname == 'system1'
+
+    - name: PUSHING A USER HOME DIRECTORY TO THE BACKUP-SERVER
+      synchronize:
+        src: /root/Downloads/home/
+        dest: admin@system2:/home/
+        mode: push
+        rsync_opts:
+          - "-e ssh"
+      when: inventory_hostname == 'system2'
+

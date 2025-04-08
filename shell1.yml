@@ -1,0 +1,9 @@
+---
+- name: shell2 with creates args
+  hosts: nis_system1
+  tasks:
+    - name: run a command if file not exist
+      shell: 
+        cmd: tail -n 10 /var/log/firewalld > firewalld.txt
+      args:
+        creates: firewalld.txt

@@ -1,0 +1,17 @@
+---
+- name: When condition
+  hosts: system1
+  vars:
+    environment: true
+  tasks:
+  - name: Installing a httpd
+    yum:
+      name: httpd
+      state: present
+    when: environment == true
+
+  - name: starting a service
+    service:
+      name: httpd
+      state: restarted
+    when: environment == true 

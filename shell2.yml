@@ -1,0 +1,11 @@
+---
+- name: checking a disk space
+  hosts: nis_system1
+  tasks:
+    - name: 
+      shell: df -h | grep /dev/sda1
+      register: disk_space
+
+    - name: 
+      debug:
+        var: disk_space.stdout_lines

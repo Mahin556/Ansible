@@ -1,0 +1,10 @@
+---
+- name: chaining
+  hosts: nis_system1
+  become: true
+  tasks:
+    - name: Executing multiple commands at once
+      shell: |
+        yum update -y &&
+        yum upgrade -y &&
+        yum install httpd -y

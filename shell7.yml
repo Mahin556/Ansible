@@ -1,0 +1,13 @@
+---
+- name: 
+  hosts: nis_system1
+  vars:
+    logs_snapshot_file: /var/log/firewalld
+  tasks:
+    - name: Run the command using a templated variable to avoid injection
+      ansible.builtin.shell: cat {{ logs_snapshot_file|quote }}
+      register: logs
+
+    - name:
+      debug:
+        var: logs.stdout_lines

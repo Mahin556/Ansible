@@ -1,0 +1,13 @@
+---
+- name: Check if a process is running
+  hosts: nis_system1
+  become: true
+  tasks:
+    - name: Executing a basic command
+      shell: ps aux | grep httpd
+      register: process_state
+      failed_when: process_state.rc != 0
+
+    - name: Display process status
+      debug:
+        var: process_state.stdout_lines

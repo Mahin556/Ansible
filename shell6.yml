@@ -1,0 +1,10 @@
+---
+- name: Change shell to bash
+  hosts: nis_system1
+  become: true
+  tasks:
+    - name: Executing a basic command
+      shell: tail -n 10 /var/log/firewalld > firewalld.txt
+      args:
+        executable: /bin/bash
+

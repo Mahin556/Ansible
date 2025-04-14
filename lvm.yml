@@ -1,0 +1,39 @@
+---
+- name:
+  hosts: all
+  become: true
+  tasks:
+    - name:
+      debug:
+        msg: "research volume group is not defined"
+      when: ansible_lvm.vgs.research1 is not defined
+      failed_when: true
+    - block:
+        - name:
+          lvol:
+            vg: research1
+            lv: data1
+            size: "1200M"
+            state: present
+      rescue:
+        - name: 
+          debug:
+            msg: "couldn't create a vg of that size"
+        - name: 
+          lvol:
+            vg: research1
+            lv: data1
+            size: "800M"
+            state: present
+      always:
+        - name:
+          setup:
+          register: ansible_facts
+        - name:
+          filesystem:
+            fstype: ext4
+            device: /dev/mapper/research1-data1
+          when:
+            - ansible_lvm.vgs.research1 is defined 
+            - ansible_lvm.lvs.data1 is defined
+        

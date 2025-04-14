@@ -1,0 +1,43 @@
+---
+- name: Creating a partition on a remote host
+  hosts: all
+  become: true
+  tasks:
+    - name: Is disk is present
+      debug:
+        msg: "Remote hosts {{ inventory_hostname }} doesn't have sdb disk"
+      when: ansible_devices.sdc is not defined
+      failed_when: true
+    - block:
+        - name: trying to create 1200MB partition
+          parted:
+            number: 1
+            device: /dev/sdc
+            part_end: 1200MiB
+            state: present
+      rescue:
+        - name: msg
+          debug:
+            msg: "Could not create a partition of that size"
+        - name: trying to create 800MB partition
+          parted:
+            number: 1
+            device: /dev/sdc
+            part_end: 800MiB
+            state: present
+      always:
+        - name: facts gather
+          setup: 
+          register: ansible_facts
+        - name: formatting
+          filesystem:
+            fstype: ext4
+            device: /dev/sdc1
+          when: ansible_devices.sdc.partitions.sdc1 is defined
+        - name: mounting
+          mount:
+            path: /srv1
+            src: /dev/sdc1
+            fstype: ext4
+            state: mounted
+          when: ansible_devices.sdc.partitions.sdc1 is defined

@@ -1,0 +1,10 @@
+---
+- name: testing umask
+  hosts: system1
+  tasks:
+    - name:
+      user:
+        name: mahin
+        state: present
+        umask: '0033'
+

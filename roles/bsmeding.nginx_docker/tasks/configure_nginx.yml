@@ -1,0 +1,133 @@
+---
+# Tasks to configure Nginx (site and proxy configs)
+
+# Proxy confs must end in subdomain.conf to auto load
+
+- name: "Copy proxy.conf"
+  ansible.builtin.template:
+    src: proxy.conf.j2
+    dest: "{{ nginx__home }}/config/nginx/proxy.conf"
+    owner: "{{ docker_uid | default('root') }}"
+    group: "{{ docker_gid | default('root') }}"
+    mode: '0660'
+  failed_when: false
+  notify: restart nginx
+
+- name: "Copy authelia-authrequest.conf"
+  ansible.builtin.template:
+    src: authelia-authrequest.conf.j2
+    dest: "{{ nginx__home }}/config/nginx/authelia-authrequest.conf"
+    owner: "{{ item.owner | default(docker_uid) | default('root') }}" # First docker user (if docker role has run), otherwise default role, otherwise root
+    group: "{{ item.group | default(docker_gid) | default('root') }}"
+    mode: '0660'
+  when: nginx__add_authelia_config|bool
+  notify: restart nginx
+
+- name: "Copy authelia-location-basic.conf"
+  ansible.builtin.template:
+    src: authelia-location-basic.conf.j2
+    dest: "{{ nginx__home }}/config/nginx/authelia-location-basic.conf"
+    owner: "{{ item.owner | default(docker_uid) | default('root') }}" # First docker user (if docker role has run), otherwise default role, otherwise root
+    group: "{{ item.group | default(docker_gid) | default('root') }}"
+    mode: '0660'
+  when: nginx__add_authelia_config|bool
+  notify: restart nginx
+
+- name: "Copy authelia-location.conf"
+  ansible.builtin.template:
+    src: authelia-location.conf.j2
+    dest: "{{ nginx__home }}/config/nginx/authelia-location.conf"
+    owner: "{{ item.owner | default(docker_uid) | default('root') }}" # First docker user (if docker role has run), otherwise default role, otherwise root
+    group: "{{ item.group | default(docker_gid) | default('root') }}"
+    mode: '0660'
+  when: nginx__add_authelia_config|bool
+  notify: restart nginx
+
+- name: "Copy certs files for https sites {{ playbook_dir }}/files/nginx/certs/ to  keys folder"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/nginx/certs/{{ item.server_name }}.crt"
+    dest: "{{ nginx__home }}/config/keys/{{ item.server_name }}.crt"
+    owner: "{{ docker_uid | default('root') }}"
+    group: "{{ docker_gid | default('root') }}"
+    mode: '0660'
+  failed_when: false
+  loop: "{{ nginx__proxy_confs_subdomain }}"
+  no_log: "{{ nginx__hide_sensitive_logs }}"
+  when: nginx__proxy_confs_subdomain is defined and nginx__proxy_confs_subdomain|length>0 and item.listen_https is defined and item.listen_https|int > 0
+  notify: restart nginx
+
+- name: "Copy certs key files for https sites {{ playbook_dir }}/files/nginx/certs/ to  keys folder"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/nginx/certs/{{ item.server_name }}.key"
+    dest: "{{ nginx__home }}/config/keys/{{ item.server_name }}.key"
+    owner: "{{ docker_uid | default('root') }}"
+    group: "{{ docker_gid | default('root') }}"
+    mode: '0640'
+  failed_when: false
+  loop: "{{ nginx__proxy_confs_subdomain }}"
+  no_log: "{{ nginx__hide_sensitive_logs }}"
+  notify: restart nginx
+  when: nginx__proxy_confs_subdomain is defined and nginx__proxy_confs_subdomain|length>0 and item.listen_https is defined and item.listen_https|int > 0
+
+- name: Check if certificate key passwords are set
+  ansible.builtin.template:
+    src: key_passphrase.j2
+    dest: "{{ nginx__home }}/config/keys/{{ item.server_name }}.passw"
+    owner: "{{ docker_uid | default('root') }}"
+    group: "{{ docker_gid | default('root') }}"
+    mode: '0640'
+  loop: "{{ nginx__proxy_confs_subdomain }}"
+  no_log: "{{ nginx__hide_sensitive_logs }}"
+  notify: restart nginx
+  when: nginx__proxy_confs_subdomain is defined and nginx__proxy_confs_subdomain|length>0 and item.cert_key_passphrase is defined
+
+
+- name: Generate proxy confs from nginx__proxy_confs_subdomain variable
+  ansible.builtin.template:
+    src: template_subdomain.conf.j2
+    dest: "{{ nginx__home }}/config/nginx/site-confs/{{ item.server_name }}.conf"
+    owner: "{{ item.owner | default(docker_uid) | default('root') }}"
+    group: "{{ item.group | default(docker_gid) | default('root') }}"
+  loop: "{{ nginx__proxy_confs_subdomain }}"
+  notify: restart nginx
+  when: nginx__proxy_confs_subdomain is defined and nginx__proxy_confs_subdomain|length>0
+
+- name: "Copy local site-confs if exists in {{ playbook_dir }}/files/nginx/site-confs/"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/nginx/site-confs/"
+    dest: "{{ nginx__home }}/config/nginx/site-confs"
+    owner: "{{ docker_uid }}"
+    group: "{{ docker_gid }}"
+    mode: '0640'
+  failed_when: false
+  notify: restart nginx
+
+- name: "Copy local site-confs for this host if exists in {{ playbook_dir }}/files/nginx/{{ inventory_hostname }}site-confs/"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/nginx/{{ inventory_hostname }}/site-confs/"
+    dest: "{{ nginx__home }}/config/nginx/site-confs"
+    owner: "{{ docker_uid }}"
+    group: "{{ docker_gid }}"
+    mode: '0640'
+  failed_when: false
+  notify: restart nginx
+
+- name: "Copy websites from ./files/nginx/sites/<subfolder> to /var/www (if exists)"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/nginx/sites/"
+    dest: "/var/www"
+    owner: "{{ docker_uid }}"
+    group: "{{ docker_gid }}"
+    mode: '0740'
+  failed_when: false
+  notify: restart nginx
+
+- name: "Copy websites for this host from ./files/nginx/{{ inventory_hostname }}/sites/<subfolder> to /var/www (if exists)"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/files/nginx/{{ inventory_hostname }}/sites/"
+    dest: "/var/www"
+    owner: "{{ docker_uid }}"
+    group: "{{ docker_gid }}"
+    mode: '0740'
+  failed_when: false
+  notify: restart nginx

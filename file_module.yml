@@ -1,0 +1,34 @@
+---
+- name:
+  hosts: system2
+  tasks:
+    - name:
+      file:
+        path: ./dir1
+        state: directory
+        mode: "1777"
+        modification_time: preserve
+        access_time: now
+    - name:
+      command: "sleep 30"
+    - name:
+      file:
+        src: ./dir1
+        dest: ./sl
+        state: link
+        mode: "1655"
+        owner: root
+        group: admin
+    - name:
+      command: "sleep 30"
+    - name:
+      file:
+        src: ./sl
+        dest: ./hl
+        state: hard
+        mode: "0644"
+        owner: admin
+        group: root
+
+
+

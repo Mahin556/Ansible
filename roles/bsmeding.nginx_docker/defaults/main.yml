@@ -1,0 +1,58 @@
+---
+nginx__name: nginx
+nginx__image: linuxserver/nginx:latest # lscr.io/linuxserver/nginx:latest
+nginx__hide_sensitive_logs: true
+nginx__port_http: 80
+nginx__port_https: 443
+nginx__trusted_proxy_cidrs: []
+nginx__skip_setup: false # When true, setup is skipped and only config tasks are executed
+nginx__remove_existing_container: false
+nginx__remove_existing_home_dir: false  # ONLY FOR AUTOMATED TEST!! WILL REMOVE ALL DATA!!!!
+nginx__pull_image: yes
+nginx__file_volumes: []
+nginx__network_mode: 'bridge'
+nginx__network_cidr: '172.16.22.0/24'
+nginx__disable_http_to_https_redirect: false
+nginx__local_certs_path: ''
+nginx__add_authelia_config: false
+nginx__authelia_upstream_host: authelia
+nginx__authelia_upstream_port: 9091
+nginx__network: 'proxy'
+nginx__container_networks:
+  - name: bridge
+  - name: "{{ nginx__network }}"
+nginx__purge_networks: no
+nginx__log_driver: json-file
+# nginx__log_options:
+nginx__home: "/opt/{{ nginx__name }}"
+nginx__directories:
+  - path: "{{ nginx__home }}"
+    mode: "0760"
+  - path: "{{ nginx__home }}/config"
+    mode: "0770"
+    owner: "{{ docker_uid|default(1040) }}"
+    group: "{{ docker_gid|default(1001) }}"
+nginx__ports:
+  - "{{ nginx__port_http }}:80"
+  - "{{ nginx__port_https }}:443"
+nginx__directory_volumes:
+  - "{{ nginx__home }}/config:/config"
+  - "/var/www:/var/www"
+nginx__default_env:
+  TZ: "{{ container_time_zone | default('Europe/Paris') }}"
+  PUID: "{{ docker_uid|default(1040) }}"
+  PGID: "{{ docker_gid|default(1001) }}"
+nginx__env: {}
+nginx__proxy_confs_subdomain: []
+  # - server_name: dash.example.com
+  #   listen: 443
+  #   listen_https: 443 # need to enable https
+  #   cert_key_passphrase: 'sbsta261da' # exampe off passhrase of cert.key file if set. Otherwise don't set this variable
+  #   enable_ldap: false
+  #   enable_authelia: true
+  #   default_upstream_proto: http
+  #   default_upstream_url: dashboard
+  #   default_upstream_port: 9090
+  #   acl_list_allowed_cidr: # default deny will be added
+  #     - 192.168.0.0/24
+  #     - 192.168.18.0/24

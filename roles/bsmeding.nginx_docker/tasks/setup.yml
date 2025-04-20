@@ -1,0 +1,66 @@
+---
+- name: Include OS-specific vars
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install packages for OS
+  ansible.builtin.package:
+    name={{ item.name }}
+    version={{ item.version | default(omit) }}
+  with_items: "{{ os_packages }}"
+  become: true
+  when: os_packages is defined
+
+- name: Install  pip packages
+  ansible.builtin.pip:
+    name: "{{ item }}"
+    state: forcereinstall
+    executable: pip3
+    extra_args: "--user --upgrade"
+    umask: "0022"
+  changed_when: false
+  with_items: "{{ python_packages }}"
+  when: python_packages is defined
+
+- name: Remove existing {{ nginx__name }} container
+  docker_container:
+    name: "{{ nginx__name }}"
+    state: absent
+  when: nginx__remove_existing_container
+
+# Add support for docker volume!!!
+- name: Remove home directory
+  file:
+    state: absent
+    path: "{{ nginx__home }}"
+  when: nginx__remove_existing_home_dir
+
+- name: Create directories
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    mode: "{{ item.mode | default('0755') }}"
+    owner: "{{ item.owner | default(docker_uid) | default('root') }}" # First docker user (if docker role has run), otherwise default role, otherwise root
+    group: "{{ item.group | default(docker_gid) | default('root') }}"
+  with_items: "{{ nginx__directories }}"
+
+- name: Create a network for nginx
+  community.docker.docker_network:
+    name: "{{ nginx__network }}"
+    ipam_config:
+      - subnet: "{{ nginx__network_cidr }}"
+        gateway: "{{ nginx__network_cidr | ansible.utils.ipaddr('next_usable') }}"
+        iprange: "{{ nginx__network_cidr }}"
+  when: nginx__network_cidr is defined and nginx__network_cidr != ''
+
+- name: Run nginx container
+  docker_container:
+    name: "{{ nginx__name }}"
+    image: "{{ nginx__image }}"
+    restart_policy: unless-stopped
+    network_mode: "{{ nginx__network_mode | default(omit)}}"
+    networks: "{{ nginx__container_networks }}"
+    ports: "{{ nginx__ports }}"
+    env: "{{ nginx__default_env | combine(nginx__env) }}"
+    volumes: "{{ nginx__directory_volumes + nginx__file_volumes }}"
+    log_driver: "{{ nginx__log_driver }}"
+    log_options: "{{ nginx__log_options | default(omit) }}"

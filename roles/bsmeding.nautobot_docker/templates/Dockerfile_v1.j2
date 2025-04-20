@@ -1,0 +1,68 @@
+ARG PYTHON_VER={{ nautobot__image_python_version | default('3.9') }}
+ARG NAUTOBOT_IMAGE={{ nautobot__image }}
+# ---------------------------------
+# Stage: PreRequistics
+# ---------------------------------
+FROM networktocode/${NAUTOBOT_IMAGE}-py${PYTHON_VER} as base
+USER 0
+RUN apt-get update -y && apt-get install -y libldap2-dev libsasl2-dev libssl-dev
+
+# Root install SAML dependencies # Removed llibxmlsec1-dev 17-09-23
+RUN apt-get update -y && apt-get install -y libxmlsec1-openssl pkg-config 
+
+# Install network tools used by Jobs
+RUN apt-get update -y && apt-get install -y net-tools iputils-ping  dnsutils
+
+# ---------------------------------
+# Stage: Builder
+# ---------------------------------
+FROM base as builder
+
+RUN apt-get install -y gcc && \
+    apt-get autoremove -y && \
+    apt-get clean all && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip wheel {{ nautobot__pip_install_extra_args }}
+RUN pip3 install --upgrade setuptools {{ nautobot__pip_install_extra_args }}
+RUN pip3 install --upgrade nautobot[ldap]=={{ (nautobot__image | split(':'))[1] }} {{ nautobot__pip_install_extra_args }}
+RUN pip3 install --upgrade ansible-core=={{ nautobot_install_ansible_version | default('2.15.11') }} {{ nautobot__pip_install_extra_args }}
+
+# Check extra pip packages to install
+{% if nautobot__extra_pip_packages is defined %}
+{% for pip_package in nautobot__extra_pip_packages %}
+RUN pip3 install --upgrade {{ pip_package }} {{ nautobot__pip_install_extra_args }}
+{% endfor %}
+{% endif %}
+
+# Check Ansible collections
+{% if nautobot__install_ansible_collections is defined %}
+{% for ansible_collection in nautobot__install_ansible_collections %}
+RUN ansible-galaxy collection install {{ ansible_collection }}{% if nautobot__ansible_collection_use_old_galaxy %} --server="https://old-galaxy.ansible.com"{% endif %} --force --ignore-certs
+
+{% endfor %}
+{% endif %}
+
+# Check Nautobot plugins
+{% if nautobot__plugins is defined %}
+RUN pip3 install --upgrade nornir-nautobot {{ nautobot__pip_install_extra_args }}
+{% for plugin in nautobot__plugins %}
+RUN pip3 install --no-warn-script-location {{ plugin.plugin_name }}{% if plugin.plugin_version %}=={{ plugin.plugin_version }}{% endif %} {{ nautobot__pip_install_extra_args }}
+
+{% endfor %}
+{% endif %}
+
+
+
+# ---------------------------------
+# Stage: Final
+# ---------------------------------
+FROM base as final
+ARG PYTHON_VER
+USER 0
+
+COPY --from=builder /usr/local/lib/python${PYTHON_VER}/site-packages /usr/local/lib/python${PYTHON_VER}/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+USER nautobot
+
+WORKDIR /opt/nautobot

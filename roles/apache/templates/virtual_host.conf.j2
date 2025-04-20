@@ -1,0 +1,63 @@
+{% if ssl is defined and ssl | lower == "yes" %}
+# Settings for a TLS enabled server.
+server {
+	listen 80; listen [::]:80; 
+	server_name  {{ server_name }} {% if server_alias is defined and server_alias | length > 0 %}{% for alias in server_alias %}{{ alias }} {% endfor %}{% endif %};
+	return 301 https://{{ server_name }};
+}
+server {
+	listen 443 ssl;
+	server_name {{ server_name }} {% if server_alias is defined and server_alias | length > 0 %}{% for alias in server_alias %}{{ alias }} {% endfor %}{% endif 
+%};
+    	#index {{ index_file }};
+	#root {{ doc_root }};
+	ssl_certificate {{ ssl_crt }};
+        ssl_certificate_key {{ ssl_key }};
+	location / {
+		root {{ doc_root }};
+		index {{ index_file }};
+{% if auth_enabled is defined and auth_enabled | lower == "yes" %}
+		#auth_basic "{{ auth_msg }}";
+		#auth_basic {{ auth_msg | to_json }};
+		auth_basic {{ auth_msg | quote }};
+		auth_basic_user_file {{ auth_file }};
+{% endif %}
+	}
+	access_log {{ access_log }};
+	error_log {{ error_log }};
+	
+	error_page 404 /404.html;
+        location = /usr/share/nginx/html/404.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /usr/share/nginx/html/50x.html {
+        }
+}
+{% endif %}
+
+{% if ssl is defined and ssl | lower == "no" %}
+server {
+        listen 80; listen [::]:80;
+        server_name  {{ server_name }} {% if server_alias is defined and server_alias | length > 0 %}{% for alias in server_alias %}{{ alias }} {% endfor %}{% endif 
+%};
+	location / {
+                root {{ doc_root }};
+		index {{ index_file }};
+{% if auth_enabled is defined and auth_enabled | lower == "yes" %}
+                auth_basic {{ auth_msg | quote }};
+                auth_basic_user_file {{ auth_file }};
+{% endif %}
+	}
+	access_log {{ access_log }};
+        error_log {{ error_log }};
+	
+	error_page 404 /404.html;
+        location = /usr/share/nginx/html/404.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /usr/share/nginx/html/50x.html {
+        }
+}
+{% endif %}

@@ -1,0 +1,76 @@
+{% if item.listen_https is undefined %}
+# Only http used
+server {
+    listen {{ item.listen }};
+    listen [::]:{{ {{ item.listen }};
+
+   server_name {{ item.server_name }};
+
+{% else %}
+# http and https, first redirect http to https
+server {
+    listen {{ item.listen }};
+    listen [::]:{{ item.listen }};
+
+    server_name {{ item.server_name }};
+
+    # redirect to https
+    return 301 https://$server_name$request_uri;
+
+}
+server {
+
+    # SSL used start listening and connect certificates
+    listen {{ item.listen_https }} ssl http2;
+    listen [::]:{{ item.listen_https }} ssl http2;
+
+    server_name {{ item.server_name }};
+
+    # SSL used, include default ssl config
+    include /config/nginx/ssl.conf;
+
+    # Overwrite ssl_cert
+    ssl_certificate /config/keys/{{ item.server_name }}.crt;
+    ssl_certificate_key /config/keys/{{ item.server_name }}.key;
+{% if item.cert_key_passphrase is defined and item.cert_key_passphrase|length>2 %}    
+    ssl_password_file /config/keys/{{ item.server_name }}.passw;
+{% endif %}
+{% endif %}{# end if listen_https is undefined #}
+
+    # Set ACL if defined
+{% if item.acl_list_allowed_cidr is defined and item.acl_list_allowed_cidr|length>0 %}
+{% for acl_item in item.acl_list_allowed_cidr %}
+    allow  {{ acl_item }};
+{% endfor %}
+
+    deny   all;
+{% endif %}
+
+
+    # Set log files
+    access_log /config/log/nginx/{{ item.server_name }}.access.log;
+    error_log /config/log/nginx/{{ item.server_name }}.error.log;
+
+    location / {
+        # enable for basic auth
+        #auth_basic "Restricted";
+        #auth_basic_user_file /config/nginx/.htpasswd;
+
+        set $upstream_app {{ item.default_upstream_url }};
+        set $upstream_port {{ item.default_upstream_port }};
+        set $upstream_proto {{ item.default_upstream_proto }};
+        proxy_pass $upstream_proto://$upstream_app:$upstream_port;
+    }
+
+    location ~ ^(.+\.php)(.*)$ {
+        fastcgi_split_path_info ^(.+\.php)(.*)$;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        include /etc/nginx/fastcgi_params;
+    }
+
+    # deny access to .htaccess/.htpasswd files
+    location ~ /\.ht {
+        deny all;
+    }
+}

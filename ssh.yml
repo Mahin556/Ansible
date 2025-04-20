@@ -1,0 +1,9 @@
+---
+- name:
+  hosts: all
+  tasks:
+    - name:
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#Port"
+        line: "Port=22"

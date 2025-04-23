@@ -1,0 +1,15 @@
+---
+- name:
+  hosts: system2
+  tasks:
+    - name:
+      copy:
+        content: |
+          "Hello"
+          "How are you"
+        dest: /etc/demo
+        mode: "0777"
+      become: true
+
+
+

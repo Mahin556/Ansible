@@ -1,0 +1,22 @@
+---
+- name:
+  hosts: system3, system2
+  tasks:
+    - name:
+      yum:
+        name: rsync
+        state: present
+
+    - name:
+      file:
+        path: /home/rsync
+        state: directory
+      when: inventory_hostname == 'system2'
+
+    - name:
+      synchronize:
+        src: /home/
+        dest: /home/rsync/
+        delete: true
+      when: inventory_hostname == 'system2'
+

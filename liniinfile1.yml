@@ -1,0 +1,10 @@
+---
+- name:
+  hosts: system2
+  tasks:
+    - name: Ensure the default Apache port is 8080
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen '
+        insertafter: '^#Listen' # If no Listen line is found, it will insert the new line after the line starting with #Listen
+        line: Listen 8080

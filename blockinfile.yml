@@ -1,0 +1,16 @@
+---
+- name:
+  hosts: system2
+  tasks:
+    - name:
+      blockinfile:
+        path: /etc/demo
+        block: |
+          # Block in file
+          #  
+          # How are you
+        marker_begin: "Block started"
+        marker_end: "Block end"
+        create: yes
+        state: present
+        insertafter: EOF

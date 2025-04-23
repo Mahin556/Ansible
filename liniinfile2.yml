@@ -1,0 +1,9 @@
+---
+- name:
+  hosts: system2
+  tasks:
+    - name:
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        line: "Hello"
+        state: present

@@ -1,0 +1,9 @@
+---
+- name:
+  hosts: system3
+  tasks:
+    - name:
+      service:
+        name: NetworkManager
+        state: restarted 
+        args: ens33

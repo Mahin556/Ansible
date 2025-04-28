@@ -1,0 +1,76 @@
+---
+- name:
+  hosts: system4
+  vars_prompt:
+    - name: "device"
+      prompt: "Enter the device for the partition or PV (e.g., /dev/sdb)"
+      private: no
+    - name: "vg_name"
+      prompt: "Enter the name for the Volume Group (e.g., vg_data)"
+      private: no
+    - name: "lv_name"
+      prompt: "Enter the name for the Logical Volume (e.g., lv_data)"
+      private: no
+    - name: "lv_size"
+      prompt: "Enter the size of the Logical Volume (e.g., 10G)"
+      private: no
+    - name: "mount_path"
+      prompt: "Enter the mount path for the Logical Volume (e.g., /mnt/data)"
+      private: no
+  tasks:
+  - name:
+    package:
+      name: lvm2
+      state: present
+
+  - name:
+    parted:
+      device: "{{ device }}"
+      number: 4
+      state: present
+      part_start: '4097MiB'
+      part_end: 100%
+      flags: [ lvm ]
+
+  - name:
+    command: "pvcreate {{ device }}4"
+    when: "'/dev/sdb4' not in ansible_lvm.pvs"
+
+  - name:
+    lvg:
+      vg: "{{ vg_name }}"
+      pvs: '{{ device }}4'
+    when: vg_name not in ansible_lvm.vgs
+
+  - name:
+    lvol:
+      vg: "{{ vg_name }}"
+      lv: "{{ lv_name }}"
+      size: "{{ lv_size }}"
+      state: present
+      
+
+  - name:
+    filesystem:
+      device: "/dev/{{ vg_name }}/{{ lv_name }}"
+      fstype: xfs
+    
+  - name:
+    file:
+      path: "{{ mount_path }}"
+      state: directory
+
+  #- name:
+   # mount: 
+    #  src: "/dev/{{ vg_name }}/{{ lv_name }}"
+     # path: "{{ mount_path }}"
+      #fstype: xfs
+      #state: mounted
+
+  - name:
+    mount:
+      src: "/dev/{{ vg_name }}/{{ lv_name }}"
+      path: "{{ mount_path }}"
+      fstype: xfs
+      opts: defaults
+      state: mounted

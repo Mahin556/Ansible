@@ -1,0 +1,49 @@
+---
+- name:
+  hosts: system4
+  tasks:
+  - name:
+    parted:
+      device: /dev/sdb
+      number: 3
+      state: present
+      flags: [ lvm ]
+      part_start: '2049MiB'
+      part_end: '4096MiB'
+
+  - name:
+    package:
+      name: lvm2
+      state: present
+
+  - name:
+    lvg:
+      vg: vg_1
+      pvs: /dev/sdb3
+      pesize: 8
+
+  - name:
+    lvol:
+      vg: vg_1
+      lv: lv_1
+      size: '1000M'
+      state: present
+      force: yes
+
+  - name:
+    file: 
+      path: /data
+      state: directory
+      mode: '0755'
+
+  - name:
+    filesystem:
+      fstype: ext4
+      device: /dev/mapper/vg_1-lv_1
+
+  - name:
+    mount:
+      src: /dev/mapper/vg_1-lv_1
+      path: /data
+      fstype: ext4
+      state: mounted

@@ -1,0 +1,12 @@
+---
+- name:
+  hosts: system4
+  tasks:
+  - name:
+    lvol:
+      vg: vg_1
+      lv: lv_1
+      size: '1200M'
+      resizefs: true
+      force: true
+      

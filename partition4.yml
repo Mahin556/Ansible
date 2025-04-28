@@ -1,0 +1,36 @@
+---
+- name:
+  hosts: system4
+  tasks:
+  - name:
+    mount:
+      path: /data
+      src: /dev/vg_1/lv_1
+      state: unmounted
+
+  - name:
+    command: e2fsck -fp /dev/vg_1/lv_1
+    register: error
+
+  - name:
+    debug:
+      var: error.stdout_lines
+
+  - name:
+    command: 'resize2fs /dev/vg_1/lv_1 800M'
+  
+  - name:
+    lvol:
+      vg: vg_1
+      lv: lv_1
+      size: '800M'
+      shrink: true
+      force: true
+
+  - name:
+    mount:
+      src: /dev/vg_1/lv_1
+      path: /data
+      fstype: ext4
+      state: mounted
+      

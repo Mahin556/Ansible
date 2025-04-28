@@ -7,6 +7,7 @@
       device: /dev/sdb
       number: "{{ item.num }}"
       state: present
+      flags: [ lvm ]
       part_start: "{{ item.start }}"
       part_end: "{{ item.end }}"
     loop:

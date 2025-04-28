@@ -1,0 +1,38 @@
+---
+- name:
+  hosts: system4
+  tasks:
+  - name:
+    parted:
+      device: /dev/sdb
+      number: "{{ item.num }}"
+      state: present
+      part_start: "{{ item.start }}"
+      part_end: "{{ item.end }}"
+    loop:
+      - {num: 1, start: "1MiB", end: "1024MiB"}
+      - {num: 2, start: "1024MiB", end: "2048MiB"}
+      
+  - name:
+    filesystem:
+      fstype: ext4
+      device: "/dev/sdb{{ item }}"
+    with_items:
+      - [1,2]
+
+  - name:
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - [/mount1, /mount2]
+
+  - name:
+    mount:
+      src: "{{ item.src }}"
+      path: "{{ item.path }}"
+      fstype: ext4
+      state: mounted
+    loop:
+      - {src: /dev/sdb1, path: /mount1 }
+      - {src: /dev/sdb2, path: /mount2 }

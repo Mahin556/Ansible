@@ -918,45 +918,115 @@ ansible-vault rekey var.yaml
 ansible-vault edit var.yaml
 ```
 
-### What are Lookups?
-- In real-world setups, a lot of configuration data like server details, passwords, and settings are stored in files (CSV, INI, TXT, etc.).
-Ansible Lookups help pull this data into your playbooks directly!
-- Lookups allow Ansible to fetch data from external files or sources (like CSV, INI, or APIs) and use it during playbook execution.
+### 🔍 What Are Lookups in Ansible?
 
-- Example: Using CSV for Passwords
-  Inventory (without passwords):
-  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image.png)
+In real-world automation, important data like **server details**, **passwords**, or **configuration settings** often live in files like CSV, INI, or TXT.  
+**Ansible lookups** help you fetch that data **at runtime**, directly into your playbooks.
 
-- Password file (credentials.csv):
-  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%202.png)
+---
 
-- Playbook Example (CSV Lookup):
-  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy.png)
-- When you run this, Ansible will read the password for webserver1 from credentials.csv.
+#### 📌 Why Use Lookups?
 
+- Pull passwords, IPs, and settings **dynamically** from files or external sources.
+- Keep your inventory clean and secure.
+- Separate data from logic — make your playbooks modular and maintainable.
 
-- Using INI Format Instead
-  INI file (credentials.ini):
-  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%203.png)
+---
 
-- Playbook Example (INI Lookup):
-  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%204.png)
-- Ansible will pull the password from the .ini file based on the section.
+#### 📁 Examples of Lookup Usage
 
-Key Points:
-  • Lookups fetch external data at runtime.
-  • Syntax must be exact for the plugin to work.
-  • Great for pulling passwords, IPs, configs from shared files.
-  • Always check the official Ansible docs for plugin options.
-  
-- General Syntax:
-![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%205.png)
-![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%206.png)
-![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%207.png)
+##### 🔐 Example 1: CSV Lookup for Passwords
 
-All lookups in Ansible happen on the control node — not on the managed (target) nodes
+###### 📄 Inventory (without passwords)
 
-Why is this important?
-- Sensitive files like credential lookups or vault passwords never leave the control node.
-- If a lookup tries to access a local file, it must exist on the control node, or it will fail.
-- It's part of why Ansible is "agentless" — no need for plugins or Python modules on the remote server to do this work.
+<img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image.png" alt="Inventory Example" width="600"/>
+
+---
+
+###### 📑 Password File: `credentials.csv`
+
+```csv
+hostname,password
+webserver1,MySuperSecret
+webserver2,AnotherSecret
+```
+
+<img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%202.png" alt="CSV File Example" width="600"/>
+
+---
+
+###### 📘 Playbook: CSV Lookup
+
+```yaml
+- name: Use CSV Lookup
+  hosts: webservers
+  vars:
+    my_password: "{{ lookup('csvfile', inventory_hostname + ' file=credentials.csv delimiter=, col=1') }}"
+  tasks:
+    - name: Show password from CSV
+      debug:
+        msg: "Password is {{ my_password }}"
+```
+
+<img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy.png" alt="CSV Lookup Playbook" width="600"/>
+
+> ✅ Ansible pulls the password for `webserver1` from `credentials.csv` dynamically.
+
+---
+
+##### 🔐 Example 2: INI Lookup for Passwords
+
+###### 📑 INI File: `credentials.ini`
+
+```ini
+[webserver1]
+password=MySuperSecret
+
+[webserver2]
+password=AnotherSecret
+```
+
+<img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%203.png" alt="INI File Example" width="600"/>
+
+---
+
+###### 📘 Playbook: INI Lookup
+
+```yaml
+- name: Use INI Lookup
+  hosts: webservers
+  vars:
+    my_password: "{{ lookup('ini', inventory_hostname + '.password file=credentials.ini') }}"
+  tasks:
+    - name: Show password from INI
+      debug:
+        msg: "Password is {{ my_password }}"
+```
+
+<img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%204.png" alt="INI Lookup Playbook" width="600"/>
+
+---
+
+#### ⚙️ General Lookup Syntax
+
+```yaml
+{{ lookup('plugin_name', 'query string') }}
+```
+
+##### 🔤 Syntax References
+
+<p float="left">
+  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%205.png" alt="Syntax Example 1" width="250"/>
+  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%206.png" alt="Syntax Example 2" width="250"/>
+  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%207.png" alt="Syntax Example 3" width="250"/>
+</p>
+
+---
+
+#### 💡 Key Points About Lookups
+
+- ✅ Lookups **run on the control node**, not the managed node.
+- 🔐 Sensitive files (like passwords) **stay on the control machine** — not copied to the remote.
+- 🔄 Useful for **CSV**, **INI**, **YAML**, **Vault**, **API**, and more.
+- ⚠️ If a file doesn’t exist on the control node, **lookup will fail**.
+- 🧼 Keeps your playbooks **agentless** and **clean** — no extra software needed on targets.

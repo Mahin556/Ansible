@@ -918,45 +918,45 @@ ansible-vault rekey var.yaml
 ansible-vault edit var.yaml
 ```
 
-
-In real-world setups, a lot of configuration data like server details, passwords, and settings are stored in files (CSV, INI, TXT, etc.).
+### What are Lookups?
+- In real-world setups, a lot of configuration data like server details, passwords, and settings are stored in files (CSV, INI, TXT, etc.).
 Ansible Lookups help pull this data into your playbooks directly!
+- Lookups allow Ansible to fetch data from external files or sources (like CSV, INI, or APIs) and use it during playbook execution.
 
-What are Lookups?
-Lookups allow Ansible to fetch data from external files or sources (like CSV, INI, or APIs) and use it during playbook execution.
+- Example: Using CSV for Passwords
+  Inventory (without passwords):
+  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image.png)
 
-Example: Using CSV for Passwords
-Inventory (without passwords):
+- Password file (credentials.csv):
+  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%202.png)
 
-
-Password file (credentials.csv):
-
-
-Playbook Example (CSV Lookup):
-
-When you run this, Ansible will read the password for webserver1 from credentials.csv.
+- Playbook Example (CSV Lookup):
+  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy.png)
+- When you run this, Ansible will read the password for webserver1 from credentials.csv.
 
 
-Using INI Format Instead
-INI file (credentials.ini):
+- Using INI Format Instead
+  INI file (credentials.ini):
+  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%203.png)
 
-
-Playbook Example (INI Lookup):
-
-Ansible will pull the password from the .ini file based on the section.
+- Playbook Example (INI Lookup):
+  ![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%204.png)
+- Ansible will pull the password from the .ini file based on the section.
 
 Key Points:
   • Lookups fetch external data at runtime.
   • Syntax must be exact for the plugin to work.
   • Great for pulling passwords, IPs, configs from shared files.
   • Always check the official Ansible docs for plugin options.
-
-
-
-General Syntax:
+  
+- General Syntax:
+![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%205.png)
+![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%206.png)
+![Alt text](https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%207.png)
 
 All lookups in Ansible happen on the control node — not on the managed (target) nodes
+
 Why is this important?
-Sensitive files like credential lookups or vault passwords never leave the control node.
-If a lookup tries to access a local file, it must exist on the control node, or it will fail.
-It's part of why Ansible is "agentless" — no need for plugins or Python modules on the remote server to do this work.
+- Sensitive files like credential lookups or vault passwords never leave the control node.
+- If a lookup tries to access a local file, it must exist on the control node, or it will fail.
+- It's part of why Ansible is "agentless" — no need for plugins or Python modules on the remote server to do this work.

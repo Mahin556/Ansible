@@ -1,0 +1,3 @@
+# In real-world setups, a lot of configuration data like server details, passwords, and settings are stored in files (CSV, INI, TXT, etc.).
+# Ansible Lookups help pull this data into your playbooks directly!
+# Lookups allow Ansible to fetch data from external files or sources (like CSV, INI, or APIs) and use it during playbook execution.

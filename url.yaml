@@ -1,0 +1,14 @@
+- name:
+  hosts: example
+  tasks:
+  - name: Check that you can connect (GET) to a page and it returns a status 200
+    ansible.builtin.uri:
+      url: https://www.google.com
+  - name: Check that a page returns successfully but fail if the word AWESOME is not in the page contents
+    ansible.builtin.uri:
+      url: http://www.example.com
+      return_content: true
+    register: this
+    failed_when: this is failed or "'AWESOME' not in this.content"
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html

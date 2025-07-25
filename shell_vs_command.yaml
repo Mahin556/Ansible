@@ -1,0 +1,108 @@
+# Shell module execute command on a remote systems shell and support ( |, >, <, >>, ENVs like PATH, HOME etc).
+# Command module execute command directly on a remote system so not support ( |, >, <, >>, ENVs like PATH, HOME etc).
+# https://stackoverflow.com/a/56682415
+# Command is more secure then a shell module because it command in it is not affected by the user environment variable.
+
+# https://spacelift.io/blog/ansible-shell-module
+
+# Other modules
+# raw
+# script
+# expect
+
+
+- name: Execute shell command
+  ansible.builtin.shell: tail -n 10 /var/log/syslog > tail_syslog.txt
+
+
+- name: This command will only run when file_to_check.txt doesn't exist
+  ansible.builtin.shell: tail -n 10 /var/log/syslog > tail_syslog.txt
+  args:
+    creates: file_to_check.txt
+
+
+- name: Check disk usage and grep for /dev/sda1
+  ansible.builtin.shell: df -h | grep /dev/sda1
+  register: disk_usage
+
+
+- name: Display output
+  ansible.builtin.debug:
+    var: disk_usage.stdout_lines
+
+
+- name: Compile software in a specific directory
+  ansible.builtin.shell: make install
+  args:
+    chdir: /path/to/source/code
+
+
+- name: Update system packages and clean up
+  ansible.builtin.shell: |
+    apt-get update &&
+    apt-get upgrade -y &&
+    apt-get clean
+
+
+- name: Check if a process is running
+  ansible.builtin.shell: ps aux | grep 'nginx' | grep -v grep
+  register: process_status
+  failed_when: process_status.rc != 0
+
+
+- name: Display process status
+  ansible.builtin.debug:
+    var: process_status.stdout_lines
+
+
+- name: Change shell to bash
+  ansible.builtin.shell: cat /var/log/*log > logs_snaphot.txt
+  args:
+    executable: /bin/bash
+
+
+- name: Run the command using a templated variable to avoid injection
+  ansible.builtin.shell: cat {{ logs_snapshot_file|quote }}
+  register: logs
+
+
+- name: Check if NGINX is installed
+  ansible.builtin.command: which nginx
+  register: nginx_installed
+  changed_when: false
+  failed_when: false
+
+
+- name: Display a message if NGINX is not installed
+  ansible.builtin.debug:
+    msg: "NGINX is not installed on this system."
+  when: nginx_installed.rc != 0
+
+
+- name: Run multiple commands
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - ls /var/log
+    - touch /tmp/tmp.txt
+    - ps aux
+
+
+- name: Install software
+  ansible.builtin.expect:
+    command: /path/to/softare/install.sh
+    responses:
+      Continue\?: "yes"
+      Please enter the installation directory: "/path/to/installation/directory"
+      Enable automatic updates\?: "no"
+
+
+- name: Run a script on a remote node
+  ansible.builtin.script: /path/to/local/script.sh --flag some_value
+
+
+- name: Run a script with custom environment variables
+  ansible.builtin.script: /path/to/local/script.sh
+  args:
+    executable: /bin/bash
+    chdir: /tmp/
+    creates: /tmp/example.txt

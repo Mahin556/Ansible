@@ -325,3 +325,8 @@ compose:
 - Save inventory to a file:
 `ansible-inventory -i dynamic_inventory_aws_ec2.yml --list --output inventory/dynamic_inventory_aws_ec2 -y`
 
+#### Inventory file variables
+```
+server1 ansible_host=<IP_or_HOSTNAME> ansible_user=<username> ansible_ssh_pass=<password> ansible_connection=<connection_type> ansible_port=<port>
+```
+ansible_connection --> ssh,local,winrm

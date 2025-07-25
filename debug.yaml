@@ -1,0 +1,9 @@
+- name:
+  debug:
+    msg: 
+    - "{{ ansible_apparmor['status'] }}"
+    - "Ansible AppArmor:- {{ ansible_apparmor['status'] }}"
+- name:
+  debug:
+    msg: "{{ ansible_apparmor['status'] }} and Ansible AppArmor:- {{ ansible_apparmor['status'] }}"
+

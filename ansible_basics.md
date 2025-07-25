@@ -1016,11 +1016,11 @@ password=AnotherSecret
 ##### 🔤 Syntax References
 
 <p float="left">
-  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%205.png" alt="Syntax Example 1" width="250"/>
+  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%205.png" alt="Syntax Example 1" width="550"/>
    <br>
-  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%206.png" alt="Syntax Example 2" width="250"/>
+  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%206.png" alt="Syntax Example 2" width="550"/>
   <br>
-  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%207.png" alt="Syntax Example 3" width="250"/>
+  <img src="https://github.com/Mahin556/Ansible/blob/3520652567076b61813b092ebaba3d8828ce7bf9/img/image%20copy%207.png" alt="Syntax Example 3" width="550"/>
 </p>
 
 ---

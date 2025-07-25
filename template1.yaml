@@ -1,0 +1,13 @@
+---
+- name: template
+  hosts: example
+  become: true
+  vars:
+    ip: "192.168.29.0"
+    hostname: "demo.com"
+  tasks:
+  - name:
+    template:
+      src:  demo.j2 # required. Path of a Jinja2 formatted template on the Ansible controller. This can be a relative or an absolute path. The file must be encoded with C(utf-8) but I(output_encoding) can be used to control the encoding of the output template.
+      dest: /etc/hosts-demo # required. Location to render the template to on the remote machine.
+      

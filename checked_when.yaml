@@ -1,0 +1,41 @@
+---
+- name: Install and verify that service is installed or not
+  hosts: Remote
+  become: true
+  tasks:
+
+    - name: Restart service
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+        enabled: yes
+
+    - name: Verify that service is started or not
+      ansible.builtin.command: systemctl status httpd
+      register: service_status
+      changed_when: false  # Avoid marking as changed
+
+    - name: Print that service_status
+      ansible.builtin.debug:
+        var: service_status.stdout_lines
+
+    - name: Check if httpd is running
+      ansible.builtin.systemd:
+        name: httpd
+      register: httpd_status
+
+    - name: Print httpd status
+      ansible.builtin.debug:
+        var: httpd_status
+
+
+- name: Check httpd service status
+  command: systemctl status httpd
+  register: service_status
+  changed_when: false  # Tell Ansible: this task never changes anything
+
+
+- name: Run custom command
+  shell: /usr/bin/custom-check.sh
+  register: result
+  changed_when: "'restarted' in result.stdout"

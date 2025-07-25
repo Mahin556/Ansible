@@ -1,0 +1,21 @@
+---
+- name:
+  hosts: example
+  tasks:
+  - name:
+    file:
+      path: "~/demo/demo.txt"
+      state: touch
+  - name:
+    blockinfile:
+      path: ~/demo/demo.txt # required. The file to modify. Before Ansible 2.3 this option was only usable as I(dest), I(destfile) and I(name).
+      state: present # not required. choices: absent;present. Whether the block should be there or not.
+      marker: "# {mark} ANSIBLE MANAGED BLOCK" # not required. The marker line template. C({mark}) will be replaced with the values C(in marker_begin) (default="BEGIN") and C(marker_end) (default="END"). Using a custom marker without the C({mark}) variable may result in the block being repeatedly inserted on subsequent playbook runs.
+      block: | 
+        "not required"
+        "The text to insert inside the marker lines."
+        "If it is missing or an empty string, the block will be removed as "777"
+        "if C(state) were specified to C(absent)."
+
+      insertafter: EOF # not required. choices: EOF;*regex*. If specified, the block will be inserted after the last match of specified regular expression. A special value is available; C(EOF) for inserting the block at the end of the file. If specified regular expression has no matches, C(EOF) will be used instead.
+      

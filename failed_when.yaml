@@ -1,0 +1,63 @@
+# a special conditional in Ansible used to manually mark a task as failed based on a custom condition, even if the task command itself did not fail.
+
+# This is very useful when:
+
+# A task technically “succeeds” (returns exit code 0), but the result is undesirable.
+
+# You want to enforce custom failure logic (e.g., based on command output or variable value).
+
+#CONDITION CHECK AFTER TASK EXECUTION
+
+- name: Run a command but fail if output contains "error"
+  command: cat /tmp/somefile.log
+  register: output
+  failed_when: "'error' in output.stdout"
+
+- name: Check disk space (simulated)
+  shell: echo 20
+  register: disk_check
+  failed_when: disk_check.stdout | int < 50
+
+- name: Run a risky command, don't fail even if it errors
+  command: /bin/false
+  register: result
+  failed_when: false
+
+---
+- name: Demo of failed_when
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Simulate health check
+      shell: echo "status=fail"
+      register: result
+      failed_when: "'Error' in result.stdout"
+
+    - name: Fail task if health check returns failure
+      debug:
+        msg: "Health check output: {{ result.stdout }}"
+      failed_when: "'fail' in result.stdout"
+
+
+---
+- name: failed
+  hosts: example
+  become: true
+  tasks:
+    - name: Ensure 'error' line is present
+      lineinfile:
+        path: /usr/share/nginx/html/index.html
+        line: error
+        state: present
+
+    - name: Read file content
+      slurp:
+        src: /usr/share/nginx/html/index.html
+      register: index_content
+      failed_when: "'error' in (index_content.content | b64decode)"
+
+
+    - name: Show index content (decoded)
+      debug:
+        msg: "{{ index_content.content | b64decode }}"

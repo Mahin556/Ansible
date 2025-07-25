@@ -1,0 +1,128 @@
+<!-- Jinja2 is a templating engine that helps Ansible handle dynamic values and create custom files.
+	• Ansible uses Jinja2 templates for variables, conditions, loops, and generating config files.
+	• Templates are processed on the Ansible controller — not on the target machine.
+	• Files usually have a .j2 extension. -->
+
+
+{{ loop.index }}.  ---> for index in for loop
+
+{# #} commint
+{{ }} Expression and variables
+{% %} For loop and if else
+
+{{ name | default(omit) }} skip if not provided
+{{ name | mandatory }} Error out if missing
+
+Fruits in reverse:
+{% for fruit in fruits | reverse %}
+- {{ fruit }}
+{% endfor %}
+
+
+Fruits with 'a' (in uppercase):
+{% for fruit in fruits if 'a' in fruit %}
+- {{ fruit | upper }}
+{% endfor %}
+
+Total fruits: {{ fruits | length }}
+
+
+Memory Check:
+Max: {{ max_memory }}
+Min: {{ min_memory }}
+Difference: {{ max_memory - min_memory }}
+
+
+All fruits except banana:
+{% for fruit in fruits | reject("equalto", "banana") %}
+- {{ fruit }}
+{% endfor %}
+
+orted fruits: {{ fruits | sort | join(', ') }}
+
+Unique ages: {{ ages | unique | join(', ') }}
+
+Favorite color: {{ favorite_color | title }}
+
+{{ my_variable | default('Not provided') }}
+
+Current time: {{ ansible_date_time.iso8601 }}
+Today is {{ ansible_date_time.date }}
+Time is {{ ansible_date_time.time }}
+
+
+{{ 'Mahin Raza' | replace(' ', '_') }}        # Mahin_Raza
+{{ unknown_variable | default('Guest') }}     # Guest
+{{ fruits | length }}                         # Count of fruits
+
+vars:
+  users:
+    alice: admin
+    bob: user
+    eve: guest
+{% for name, role in users.items() %}
+- {{ name }} is a {{ role }}
+{% endfor %}
+
+{% if age > 18 and voting_center == 'jaipur' %}
+You can vote in Jaipur.
+{% else %}
+Voting not allowed.
+{% endif %}
+
+{% set fruits = ['apple', 'banana'] %}
+{% set prices = [10, 20] %}
+{% for item in fruits | zip(prices) %}
+- {{ item[0] }} costs ₹{{ item[1] }}
+{% endfor %}
+
+
+{% for i in range(1, 6) %}
+- Line {{ i }}
+{% endfor %}
+
+
+Top Fruits:
+{% for fruit in fruits %}
+{{ loop.index }}. {{ fruit }}{% if loop.first %} (first){% endif %}{% if loop.last %} (last){% endif %}
+{% endfor %}
+
+
+{% for fruit in fruits %}
+- {{ fruit }}
+  {% if fruit == 'banana' %}
+    (Great source of potassium!)
+  {% endif %}
+{% endfor %}
+
+
+Favorite fruits: {{ fruits | join(', ') }}
+
+{{ "%0.2f"|format(3.14159) }}  → 3.14
+
+{% set full_name = name + ' Raza' %}
+Hello {{ full_name }}
+
+vars:
+  names: [ 'apple', 'banana', 'cherry' ]
+  colors: [ 'red', 'yellow', 'red' ]
+{% for name, color in names | zip(colors) %}
+- {{ name }} is {{ color }}
+{% endfor %}
+
+
+List of Fruits:
+
+{% for fruit in fruits %}
+{{ loop.index }}. {{ fruit }}
+   {% if loop.first %}↪ This is the first fruit{% endif %}
+   {% if loop.last %}↪ This is the last fruit{% endif %}
+{% endfor %}
+
+List of Fruits:
+1. apple
+   ↪ This is the first fruit
+2. banana
+3. mango
+4. kiwi
+   ↪ This is the last fruit

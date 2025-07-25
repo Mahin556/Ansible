@@ -1,0 +1,51 @@
+- name: Installing packages with index
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - httpd
+    - nginx
+    - autofs
+    - nfs-utils
+  loop_control:
+    index_var: idx
+    label: "{{ idx + 1 }}. {{ item }}"
+
+
+- name: Installing categorized packages
+  yum:
+    name: "{{ item.value }}"
+    state: present
+  loop:
+    - { key: web, value: httpd }
+    - { key: proxy, value: nginx }
+    - { key: auto, value: autofs }
+  loop_control:
+    label: "{{ item.key }} - {{ item.value }}"
+
+
+- name: Conditionally install some packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - httpd
+    - nginx
+    - autofs
+    - nfs-utils
+  when: item != "autofs"
+
+---
+- name: 
+  hosts: example
+  vars:
+    user_list:
+      - alice
+      - bob
+      - charlie
+  tasks:
+  - name: Creating multiple users
+    user:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ user_list }}"

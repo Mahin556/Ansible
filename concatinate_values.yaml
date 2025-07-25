@@ -1,0 +1,9 @@
+- name: Debugging Variable Values
+  hosts: Remote
+  vars:
+    greeting: "Hello"
+    name: "World"
+  tasks:
+    - name: Print the greeting
+      debug:
+        msg: "{{ greeting }} {{ name }}"

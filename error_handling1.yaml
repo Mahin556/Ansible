@@ -1,0 +1,25 @@
+---
+- name:
+  hosts: example
+  tasks:
+  - name: 
+    yum:
+      name: httpd
+      state: present
+      update_cache: yes
+    ignore_errors: true
+
+#Most of the time we use it with command or shell module
+#By default, Ansible stops running on a host if a task fails (usually when a command or module returns a non-zero code).
+# But sometimes, you might want to:
+#   Ignore a failure and keep going.
+#   Or stop the whole playbook for all hosts if one host fails.
+# Ansible gives you tools to control this!
+
+# ignore_errors only works if the task starts and fails in a way Ansible can catch.
+#  It won’t ignore errors like:
+#    Invalid syntax.
+#    Undefined variables.
+#    Connection problems.
+#    Broken YAML formatting.
+# These issues must be fixed — ignore_errors can’t help with them!

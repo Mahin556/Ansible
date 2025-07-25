@@ -1,0 +1,13 @@
+---
+- name: Conditional Installation of nginx
+  hosts: Remote
+  become: true
+  tasks:
+    - name: Check if nginx is installed
+      command: rpm -q nginx
+      register: is_installed
+      ignore_errors: true
+
+    - name: Install nginx if not present
+      command: yum install -y nginx
+      when: "'nginx' not in is_installed.stdout"

@@ -1,0 +1,25 @@
+---
+- name: Install multiple packages
+  hosts: example
+  vars:
+    pkgs:
+      - httpd 
+      - nfs-server
+    users:
+      - Mahin
+      - Raza
+  tasks:
+  - name: 
+    apt:
+      name: "{{ item}}" #predefine keyword represent item of list
+    with_item:
+      - apache2 
+      - nfs-server
+  - name: With variable
+    yum:
+      name: "{{ item }}"
+    loop: "{{ pkgs }}" #iterate over a list of item
+  - name: With variable
+    user:
+      name: "{{ item }}"
+    loop: "{{ users }}" #iterate over a list of item

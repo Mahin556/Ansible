@@ -1,0 +1,15 @@
+---
+- name:
+  hosts: example
+  vars:
+    user_name: Mahin
+    group_name: Dev
+  tasks:
+  - name:
+    user:
+      name: "{{ user_name }}"
+      state: present
+  - name:
+    group:
+      name: "{{ group_name }}"
+      state: present

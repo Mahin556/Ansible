@@ -1,0 +1,13 @@
+---
+- name:
+  hosts: example
+  tasks:
+  - name:  demo cron job
+    cron:
+      name: demo cron job
+      user:  vagrant
+      job:  "touch ~/cron_file"
+      state: present # not required. choices: absent;present. Whether to ensure the job or environment variable is present or absent.
+      minute: 12
+      hour: 11
+    

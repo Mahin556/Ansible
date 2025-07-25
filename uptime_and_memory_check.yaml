@@ -1,0 +1,17 @@
+- name: Example playbook to check uptime and free memory
+  hosts: Remote
+  become: true
+  tasks:
+    - name: To check uptime of remote hosts
+      command: uptime
+      register: host_uptime
+
+    - name: To check free space available in remote hosts
+      command: free -h
+      register: host_free_space
+
+    - name: Displaying the remote host Uptime and Free space
+      debug:
+        msg:
+          - "Uptime: {{ host_uptime.stdout_lines }}"
+          - "Free Space: {{ host_free_space.stdout_lines }}"

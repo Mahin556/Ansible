@@ -1,0 +1,18 @@
+---
+- name:
+  hosts: example
+  tasks:
+  - name:
+    stat: 
+      path: /etc/hosts-demo1
+    register: file_meta    
+
+  - name:
+    debug:
+      msg: "{{ file_meta }}"
+
+  - name:
+    file: 
+      path: /etc/hosts-demo1
+      state: touch 
+    when: not file_meta.stat.exists

@@ -1,0 +1,56 @@
+#intentionally stop playbook execution when a condition is not met
+#  CUSTOM ERROR
+---
+- name: Collect a fact and print
+  hosts: example
+  become: true
+  gather_facts: true
+  vars:
+    some_variable: expected_value1
+  tasks:
+  - name: Fail if condition is not met
+    fail:
+      msg: "This playbook has failed because the condition was not met."
+    when: some_variable != "expected_value"
+    
+---
+- name: Example using fail module
+  hosts: example
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Fail if not CentOS
+      fail:
+        msg: "This playbook only supports CentOS. Current OS is {{ ansible_distribution }}"
+      when: ansible_distribution != "CentOS"
+
+--- 
+- name: Fail if max_memory is too low
+  vars:
+    max_memory: 128
+  fail:
+    msg: "Insufficient memory! Required > 256, found {{ max_memory }}"
+  when: max_memory < 256
+
+---
+- name: Memory check
+  hosts: all
+  gather_facts: false
+  vars:
+    max_memory: 128
+
+  tasks:
+    - name: Fail if max_memory is less than 256
+      fail:
+        msg: "System does not meet memory requirement! Found: {{ max_memory }}"
+      when: max_memory < 256
+
+    - name: Pass check if memory is sufficient
+      debug:
+        msg: "Memory is sufficient: {{ max_memory }}"
+      when: max_memory >= 256
+
+
+
+

@@ -1,0 +1,47 @@
+# Using when Conditional Statements
+# Ansible uses the when keyword along with Jinja2 expressions to control when a task should be executed.
+# If condition is false then it skips the tasks
+# "==" is equal to 
+# "!=" is not equal to 
+# "<" less then
+# ">" greater then
+# ">=" greater then or equal to 
+# "<=" less then or equal to 
+# "in" keyword
+# boolen value (true or false)
+# "is defined"
+# "is not defined"
+# "in"
+# "or"
+# "and" 
+
+- name: 
+  hosts:
+  vars:
+    age: 19
+  tasks:
+  - name: "Creating file if age is 18"
+    command: touch /tmp/18.txt
+    when: age == 18
+  - name: "Creating file if age is greater than 18"
+    command: touch /tmp/greater_than_18.txt
+    when: age > 18
+
+- name: 
+  hosts:
+  vars:
+    age: 15
+  tasks:
+  - name: "Creating file if age is between 10 and 18"
+    command: touch /tmp/between_10_and_18.txt
+    when: age > 10 and age < 18
+
+- name: 
+  hosts:
+  vars:
+    age: 11
+  tasks:
+  - name: "Creating file if age is 10 or 11"
+    command: touch /tmp/10_or_11.txt
+    when: age == 10 or age == 11
+

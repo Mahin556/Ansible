@@ -1,0 +1,12 @@
+You fav color it {{ favorite_color }}
+You fav fruites is:
+{% for fruit in fruits %}
+{{ loop.index }}. {{ fruit }}
+{% endfor %}
+
+
+{% if age > 18 %}
+You are allowed to vote at {{ voting_center }}
+{% else %}
+Sorry, you are not allowed to vote
+{% endif %}

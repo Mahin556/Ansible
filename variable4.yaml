@@ -1,0 +1,17 @@
+- name: ---
+  hosts: Remote
+  become: true
+  tasks:
+    - name: Print a simple message
+      debug:
+        msg: "This is just a sample play"
+
+    - name: Show the value of variable
+      vars:
+        TEST: "test var"
+      debug:
+        var: TEST
+
+    - name: Display regular expression (string)
+      debug:
+        msg: "Sum of 2 + 2 is {{ 2+2 }}"

@@ -1,0 +1,19 @@
+---
+- name: jinja2 template example
+  hosts: example
+  become: true
+  vars:
+    age: 19
+    voting_center: jaipur
+    fruits:
+      - apple
+      - banana
+      - grape
+      - orange
+    favorite_color: red
+
+  tasks:
+    - name: template testing
+      template:
+        src: demo2.j2
+        dest: /etc/test.conf

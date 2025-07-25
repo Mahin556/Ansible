@@ -1,0 +1,7 @@
+- name: Pause for Confirmation
+  hosts: example
+  become: true
+  tasks:
+    - name: Wait for user confirmation
+      pause:
+        prompt: "Proceed with next step? Press Enter to continue..."

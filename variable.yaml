@@ -1,0 +1,14 @@
+---
+- name: 
+  hosts: example
+  vars:
+    user_list:
+      - alice
+      - bob
+      - charlie
+  tasks:
+  - name: Creating multiple users
+    user:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ user_list }}"

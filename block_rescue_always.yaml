@@ -1,0 +1,22 @@
+---
+- name: Block Module
+  hosts: example
+  become: yes
+  tasks:
+    - name: Install Apache on CentOS
+      block:
+        - name: update Database
+          shell:
+            cmd: "echo 'database updation script'"
+      rescue:
+        - name: Rescue Database
+          shell:
+            cmd: "echo 'database revert to original state script'"
+      always:
+        - name: run always
+          service:
+            name: mariadb
+            state: restarted
+
+
+     

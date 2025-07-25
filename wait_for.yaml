@@ -1,0 +1,13 @@
+#Waiting for a String in a File
+- name: tasks
+  hosts: Remote
+  become: true
+  tasks:
+    - name: Tasks
+      wait_for:
+        path: /var/www/mahin/index.html
+        search_regex: "String exists, continue"
+
+# wait_for is used to check if a file contains a specific string.
+# Useful in deployment pipelines to verify that a config or HTML file is ready.
+

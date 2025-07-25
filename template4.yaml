@@ -1,0 +1,10 @@
+- name: Render Config Template
+  hosts: Remote
+  become: true
+  vars:
+    custom_port: 8080
+  tasks:
+    - name: Template render
+      template:
+        src: config.j2
+        dest: /etc/myapp/config.cfg

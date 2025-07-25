@@ -1,0 +1,15 @@
+---
+- name:
+  hosts: example
+  tasks:
+  - name:
+    ansible.builtin.setup:
+    register: result
+  - name:
+    debug:
+      msg: "{{ result }}"
+  - name:
+    debug:
+      var: "hello"
+    
+    

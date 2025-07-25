@@ -1,0 +1,106 @@
+--- 
+- name:
+  hosts: example
+  vars:
+    values:
+      - 10
+      - 15
+      - 20
+      - 25
+      - 30
+    supported_distribution:
+      - "Fedora"
+      - "CentOS"
+      - "RedHat"
+
+    isInstall: true
+
+  tasks:
+  - name:
+    yum:
+      name: httpd
+      state: present
+    when: ansible_distribution == "Fedora" or ansible_distribution == "CentOS"
+
+  - name:
+    yum:
+      name: httpd
+      state: present
+    when: 
+    - ansible_distribution == "Fedora"
+    - ansible_distribution == "CentOS" #and condition
+
+  - name: Install httpd on specific distros and versions
+    yum:
+      name: httpd
+      state: present
+    when: 
+      (ansible_distribution == "Fedora" and ansible_distribution_version == "10") or 
+      (ansible_distribution == "CentOS" and ansible_kernel == "5.6.2")
+
+  - name:
+    yum:
+      name: httpd
+      state: present
+    when: ansible_distribution_version == "10" or ansible_kernel == "5.6.2"
+
+  - name:
+    yum:
+      name: httpd
+      state: present
+    when: 10 in values
+
+  - name:
+    yum:
+      name: httpd
+      state: present
+    when: ansible_distribution is defined and ansible_distribution in supported_distribution
+
+  - name:
+    yum:
+      name: httpd
+      state: present
+    when: isInstall
+
+  - name: Check if ansible distribution is CentOS
+    debug:
+      msg: "The ansible distribution is CentOS"
+    when: ansible_distribution == "CentOS"
+
+  - name: Check if ansible kernel is 5.14.0-539.el9.x86_64
+    debug:
+      msg: "The ansible kernel is 5.14.0-539.el9.x86_64"
+    when: ansible_kernel == "5.14.0-539.el9.x86_64"
+
+  - name: Check if max_memory is equal to 512
+    debug:
+      msg: "Yes, the max_memory is equal to 512"
+    when: max_memory == 512
+
+  - name: Check if min_memory is equal to 128
+    debug:
+      msg: "Yes, the min_memory is equal to 128"
+    when: min_memory == 128
+
+  - name: Check if min_memory is less than max_memory
+    debug:
+      msg: "Yes, the min_memory is less than max_memory"
+    when: min_memory < max_memory
+
+  - name: Check if max_memory is greater than min_memory
+    debug:
+      msg: "Yes, the max_memory is greater than min_memory"
+    when: max_memory > min_memory
+
+  - name: Check if max_memory is greater or equal to min_memory
+    debug:
+      msg: "Yes, the max_memory is greater or equal to min_memory"
+    when: max_memory >= min_memory
+
+  - name: Check if max_memory is defined
+    debug:
+      msg: "Yes, the max_memory is defined"
+    when: max_memory is defined
+
+
+  

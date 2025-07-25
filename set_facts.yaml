@@ -1,0 +1,11 @@
+- name: Using set_fact for Runtime Variable
+  hosts: Remote
+  become: true
+  tasks:
+    - name: Set custom var
+      set_fact:
+        custom_port: 8080
+
+    - name: Use custom var
+      debug:
+        msg: "Port is {{ custom_port }}"

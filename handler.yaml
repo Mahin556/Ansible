@@ -1,0 +1,27 @@
+---
+- name: Install and Start Apache httpd Web Server
+  hosts: Remote
+  become: true
+
+  vars:
+    srv: httpd
+
+  tasks:
+    - name: Install {{ srv }}
+      yum:
+        name: "{{ srv }}"
+        state: present
+
+    - name: Configure {{ srv }}
+      copy:
+        src: ./index.html
+        dest: /var/www/html/index.html
+        mode: '0755'
+      notify: restart
+
+  handlers:
+    - name: restart
+      service:
+        name: "{{ srv }}"
+        state: restarted
+        enabled: true

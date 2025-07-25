@@ -1,0 +1,3 @@
+# In Ansible, host_vars and group_vars are directories used to store variables associated with individual hosts and groups of hosts
+
+# host_vars contains YAML files for specific hosts, while group_vars holds YAML files for groups of hosts. 

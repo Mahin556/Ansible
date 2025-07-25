@@ -1,0 +1,15 @@
+---
+- name: Collect a fact and print
+  hosts: example
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Print facts
+      debug:
+        msg:
+          - "AppArmor: {{ ansible_facts['apparmor']['status'] }}"
+          - "IPv4: {{ ansible_facts['all_ipv4_addresses'] }}"
+          - "IPv6: {{ ansible_facts['all_ipv6_addresses'] }}"
+          - "Python version: {{ ansible_facts['python_version'] }}"
+          - "SELinux: {{ ansible_facts['selinux']['status'] }}"
+          - "Python executable: {{ ansible_facts['python']['executable'] }}"

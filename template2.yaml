@@ -1,0 +1,9 @@
+---
+- name: template
+  hosts: example
+  become: true
+  tasks:
+  - name: using ansible facts
+    template:
+      src:  demo1.j2 
+      dest: /etc/hosts-demo1

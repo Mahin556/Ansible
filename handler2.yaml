@@ -1,0 +1,32 @@
+---
+- name: handler1
+  hosts: example
+  vars:
+    httpd_conf_file: "/var/www/html/httpd.conf"
+  tasks:
+    - name: task1
+      yum: 
+        name: httpd 
+        state: present
+    - name:
+      shell: "sed -i 's/Listen 80/Listen 81/g' {{ httpd_conf_file }}"
+      #https://gist.github.com/TheSunMan/4008088
+      become: true
+      notify:
+        - Restart httpd
+        - Config firewalld
+
+  handlers:
+    - name: Restart httpd
+      service:
+        name: httpd
+        state: restarted
+        enabled: true
+    - name: Config firewalld
+      firewalld:
+        service: 
+          - https
+          - http
+        state: enabled
+        permanent: true
+        immediate: true

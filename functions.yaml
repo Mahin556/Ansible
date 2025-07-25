@@ -1,0 +1,68 @@
+---
+
+- name: Functions
+  hosts: example
+  vars:
+    name: "Mahin Raza"
+    number: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ages: [12, 13, 13, 22, 45, 22, 32, 45, 45, 34, 34, 32]
+
+  tasks:
+    - name: Show ansible_distribution in lowercase
+      debug:
+        msg: "{{ ansible_distribution | lower }}"
+
+    - name: Show ansible_distribution in uppercase (only if CentOS)
+      debug:
+        msg: "{{ ansible_distribution | upper }}"
+      when: ansible_distribution | lower == "centos"
+
+    - name: Print name
+      debug:
+        msg: "Hello {{ name }}"
+
+    - name: Print name in uppercase
+      debug:
+        msg: "Upper {{ name | upper }}"
+
+    - name: Print name in lowercase
+      debug:
+        msg: "Lower {{ name | lower }}"
+
+    - name: Print Min
+      debug:
+        msg: "Min {{ number | min }}"
+
+    - name: Print Max
+      debug:
+        msg: "Max {{ number | max }}"
+
+    - name: Print unique value
+      debug:
+        msg: "unique {{ ages | unique }}"
+
+    - name: replace
+      debug:
+        msg: "Replace {{ name | replace('Mahin','Raza') }}"
+
+    - name: union
+      debug:
+        msg: "union {{ number | union(ages) }}"
+
+    - name: intersection
+      debug:
+        msg: "Intersect {{ number | intersect(ages) }}"
+
+    - name: Random
+      debug:
+        msg: "random {{ 100 | random }}"
+
+    - name: Random number between 50 and 100
+      debug:
+        msg: "random {{ range(50, 101) | random }}"
+        
+    - name: File name
+      debug:
+        msg: "file name {{ '/etc/ansible/ansible.cfg' | basename }}"
+
+    

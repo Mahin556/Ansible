@@ -1,0 +1,38 @@
+# Defined anywhere and can call then need in playbook.
+# ansible.cfg
+# In the playbook itself,
+# In the inventory file,
+# At the command line,
+# Another yml file,
+# host_vars dir
+# group_vars dir
+# Or even during runtime by assigning a return value to a new variable.
+# Once created, you can use variables in conditional statements, loops, and as task arguments.
+
+# A variable name can only include letters, numbers, and underscores — and cannot start with a number.
+
+# variabel file
+
+#inventory
+# [example]
+# www.example.com
+# localhost user_name=mahin #host specific variable
+
+- name:
+  hosts: example
+  vars_files:
+  - file1.txt
+  vars:
+  - pkg: httpd
+  - user_name: demo
+  tasks:
+  - name: "{{ pkg }} Installing"
+    yum:
+      name: "{{ pkg }}"
+      state: present
+  - name: "{{ user_name }}"
+    user: 
+      name: "{{ user_name }}"
+      state: present
+
+  

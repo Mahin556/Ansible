@@ -1,0 +1,10 @@
+---
+- name: 
+  hosts: example
+  tasks:
+  - name: debug
+    debug:
+      msg: 
+      - "{{ host_name }}"
+      - "{{ group_name }}"
+  

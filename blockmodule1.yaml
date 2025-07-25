@@ -1,0 +1,33 @@
+---
+- name: Block Module
+  hosts: example
+  become: yes
+  tasks:
+    - name: Install Apache on CentOS
+      block:
+        - name: Install httpd
+          yum:
+            name: httpd
+            state: present
+
+        - name: Start httpd
+          service:
+            name: httpd
+            state: started
+            enabled: true
+      when: ansible_distribution | lower == "centos"
+
+    - name: Install Apache on Ubuntu
+      block:
+        - name: Install apache2
+          apt:
+            name: apache2
+            state: present
+            update_cache: true
+
+        - name: Start apache2
+          service:
+            name: apache2
+            state: started
+            enabled: true
+      when: ansible_distribution | lower == "ubuntu"

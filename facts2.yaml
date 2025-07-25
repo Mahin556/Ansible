@@ -1,0 +1,7 @@
+- name: Show System Facts
+  hosts: Remote
+  become: true
+  tasks:
+    - name: Show architecture
+      debug:
+        msg: "System is running on {{ ansible_architecture }}"

@@ -1,0 +1,16 @@
+- name: Looping over Dictionary
+  hosts: Remote
+  become: true
+  vars:
+    users:
+      - name: user1
+        uid: 1101
+      - name: user2
+        uid: 1102
+  tasks:
+    - name: Create users with specific UID
+      user:
+        name: "{{ item.name }}"
+        uid: "{{ item.uid }}"
+        state: present
+      loop: "{{ users }}"

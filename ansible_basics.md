@@ -69,7 +69,7 @@ all:
 ```
 - To see all hosts 
 ```
-ansible-inventory -i hosts --host all
+ansible-inventory -i hosts --host webserver
 
 {
     "ansible_host": "192.168.29.43",

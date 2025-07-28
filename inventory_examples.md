@@ -327,6 +327,7 @@ compose:
 
 #### Inventory file variables
 ```
-server1 ansible_host=<IP_or_HOSTNAME> ansible_user=<username> ansible_ssh_pass=<password> ansible_connection=<connection_type> ansible_port=<port>
+server1 ansible_host=<IP_or_HOSTNAME> ansible_ssh_private_key_file=<public_key_file>
+ansible_user=<username> ansible_ssh_pass=<password> ansible_connection=<connection_type> ansible_port=<port>
 ```
 ansible_connection --> ssh,local,winrm

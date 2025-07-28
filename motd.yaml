@@ -1,0 +1,16 @@
+---
+- name: Set MOTD on remote servers
+  hosts: all  # Or a specific host group
+  tasks:
+    - name: Copy MOTD template to /etc/motd
+      ansible.builtin.template:
+        src: motd.j2
+        dest: /etc/motd
+        owner: root
+        group: root
+        mode: '0644'
+
+# Example motd.j2 template
+# Welcome to {{ ansible_hostname }}!
+# System uptime: {{ ansible_uptime_seconds }} seconds.
+

@@ -1,0 +1,12 @@
+---
+- name:
+  hosts: example
+  vars:
+    mylist:
+      - number1
+      - number2
+  tasks:
+  - name:
+    debug:
+      msg: "{{ lookup('items', mylist) }}"
+    

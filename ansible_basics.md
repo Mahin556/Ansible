@@ -290,6 +290,11 @@ ansible-doc -l
 ansible-doc -F
 ```
 
+##### Get detail about any plugin
+```
+ansible-doc -t <plugin_type> <plugin_name>
+```
+
 ##### Get detail information about specific module
 ```
 ansible-doc <module>
@@ -808,6 +813,7 @@ collections_path = /root/Ansible/mycollection
 ask_pass = false  #enable remote user pass or not
 host_key_checking = false
 private_key_file = ~/.ssh/ansible
+DEFAULT_POLL_INTERVAL = 15(default) #https://docs.ansible.com/ansible/latest/reference_appendices/config.html#default-poll-interval
 
 [privilege_escalation]
 become = true    #Enable a privilage escalation
@@ -1032,3 +1038,120 @@ password=AnotherSecret
 - 🔄 Useful for **CSV**, **INI**, **YAML**, **Vault**, **API**, and more.
 - ⚠️ If a file doesn’t exist on the control node, **lookup will fail**.
 - 🧼 Keeps your playbooks **agentless** and **clean** — no extra software needed on targets.
+
+
+### Ansible Asynchronous Actions and Polling
+- By default, Ansible runs tasks synchronously — meaning it waits for one task to finish before moving on to the next. This can be a problem if a task takes too long, like over 10 minutes, because the SSH connection between the Ansible controller and the remote machine might time out before the task finishes.
+
+- To handle long-running tasks, Ansible offers Asynchronous Mode, which allows tasks to run in the background so the playbook doesn’t have to wait, and it can check their status later using polling.
+
+#### Synchronous Example:
+
+- In a normal setup, if you write a task like this:
+```
+- name: this is our 1st play.
+  hosts: webserver1
+  tasks:
+  - name: "sleep for 120 sec"
+    command: sleep 120
+  - name: "second task"
+    command: touch /tmp/second_task.txt
+```
+- The playbook will wait for 120 seconds before moving to the second task. If the connection drops during this time, the task fails.
+
+#### Asynchronous Example:
+- You can avoid that by using async and poll. Here’s how:
+```
+- name: this is our 1st play.
+  hosts: webserver1
+  tasks:
+  - name: "sleep for 60 sec"
+    command: sleep 60
+    async: 70
+    poll: 35
+  - name: "second task"
+    command: touch /tmp/second_task.txt
+```
+- async: 70 means the task is allowed to run for up to 70 seconds.
+- poll: 35 means Ansible will check the task status every 35 seconds.
+
+#### Fire-and-Forget Mode (poll: 0):
+- If you don’t want Ansible to wait at all, you can set poll: 0. Ansible will start the task and immediately move to the next one without checking if the first task finished.
+
+```
+- name: this is our 1st play. hosts: webserver1
+  tasks:
+  - name: "sleep for 120 sec"
+    command: sleep 120
+    async: 60
+    poll: e
+  - name: "second task"
+    command: touch /tmp/second_task.txt
+```
+
+- In this case, the sleep command starts and Ansible jumps to the next task without waiting.
+- If you don’t set async, the task runs normally (synchronously).
+- The default polling interval is 15 seconds, which can be changed in the Ansible config (DEFAULT_POLL_INTERVAL).
+- async and poll are helpful for long or non-critical tasks, especially when you want to save time or avoid connection problems.
+
+
+### Roles
+#### Create a Role
+```
+ansible-galaxy init dummy
+```
+Default Roles directory in ansible host ---> /etc/ansible/roles
+
+- including role in playbook
+```
+---
+- name:
+  roles:
+  - role: <role_name>
+    vars:
+      role_var:<value>
+
+- hosts: all
+  roles:
+    - common
+    - webserver
+
+# import_role is used to statically import a role.
+- hosts: all
+  tasks:
+  - name: Run some other task
+    import_role:
+      name: common
+    
+    import_role:
+      name: webserver
+
+# include_role is used to dynamically include a role.
+- hosts: all
+  tasks:
+  - name: Run some other task
+    include_role:
+      name: common
+    
+    include_role:
+      name: webserver
+```
+
+### Specify the config file in ansible CLI Command
+```
+ansible-playbook --config /path/to/your/custom_ansible.cfg your_playbook.yml
+```
+```
+Explanation:
+ansible-playbook: The Ansible command being executed (e.g., ansible, ansible-playbook, ansible-galaxy).
+--config or -c: The option to specify the path to your custom configuration file.
+/path/to/your/custom_ansible.cfg: The absolute or relative path to your custom Ansible configuration file.
+your_playbook.yml: The playbook you are executing (or other arguments relevant to the specific Ansible command).
+```
+- Precedence:
+- It is important to note the order of precedence for Ansible configuration files:
+  - ANSIBLE_CONFIG environment variable: If this environment variable is set, it takes the highest precedence.
+  - ansible.cfg in the current working directory: If found, this file is used.
+  - ~/.ansible.cfg in the user's home directory: If the above are not found, Ansible looks here.
+  - /etc/ansible/ansible.cfg: The default system-wide configuration file.
+- Using the --config option directly on the command line overrides all other configuration file locations for that specific command execution.

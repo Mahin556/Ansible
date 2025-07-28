@@ -1,3 +1,17 @@
+### SSH Key Copy
+
+##### Copy a custom SSH Key
+- ssh-copy-id command
+```
+ssh-copy-id -i ~/.ssh/ansible.pub vagrant@192.168.29.109
+
+Default copy id_rsa.pub
+```
+- scp command
+```
+scp /path/to/your/custom_key.pub username@remote_host:~/.ssh/custom_key.pub
+ssh username@remote_host 'cat ~/.ssh/custom_key.pub >> ~/.ssh/authorized_keys && rm ~/.ssh/custom_key.pub'
+```
 
 ### Ansible-inventory command
 - To Validate an Ansible inventory file and output the result in JSON format(Inventory listing): 

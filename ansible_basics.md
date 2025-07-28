@@ -68,7 +68,8 @@ all:
        10.0.2.3: {}
 ```
 - To see all hosts 
-```ansible-inventory -i hosts --host all
+```
+ansible-inventory -i hosts --host all
 
 {
     "ansible_host": "192.168.29.43",

@@ -331,3 +331,83 @@ server1 ansible_host=<IP_or_HOSTNAME> ansible_ssh_private_key_file=<public_key_f
 ansible_user=<username> ansible_ssh_pass=<password> ansible_connection=<connection_type> ansible_port=<port>
 ```
 ansible_connection --> ssh,local,winrm
+```
+server1 ansible_host=192.168.1.100 ansible_user=ubuntu \
+        ansible_ssh_private_key_file=~/.ssh/id_rsa \
+        ansible_connection=ssh ansible_port=22 \
+        ansible_python_interpreter=/usr/bin/python3 \
+        ansible_become=true ansible_become_user=root
+```
+## Inventory variables
+# Extend markdown content to include examples for each group of variables
+
+markdown_with_examples = """
+### ✅ Connection Variables (SSH/WinRM-related)
+- `ansible_host`: IP or hostname to connect to  
+  _Example:_ `ansible_host=192.168.1.10`
+- `ansible_user`: SSH username  
+  _Example:_ `ansible_user=ubuntu`
+- `ansible_password` / `ansible_ssh_pass`: SSH password  
+  _Example:_ `ansible_ssh_pass=ubuntu123`
+- `ansible_port`: SSH port (default: 22)  
+  _Example:_ `ansible_port=2222`
+- `ansible_ssh_private_key_file`: Path to the private key file  
+  _Example:_ `ansible_ssh_private_key_file=~/.ssh/id_rsa`
+- `ansible_ssh_common_args`: Extra SSH arguments  
+  _Example:_ `ansible_ssh_common_args='-o StrictHostKeyChecking=no'`
+- `ansible_connection`: Connection type (ssh, paramiko, local, docker, winrm, etc.)  
+  _Example:_ `ansible_connection=ssh`
+- `ansible_become`: Set to `true` to escalate privileges  
+  _Example:_ `ansible_become=true`
+- `ansible_become_user`: User to become after login (e.g., root)  
+  _Example:_ `ansible_become_user=root`
+- `ansible_become_method`: Method for privilege escalation (sudo, su, etc.)  
+  _Example:_ `ansible_become_method=sudo`
+
+### ✅ Windows-Specific Variables
+- `ansible_connection=winrm`: Use WinRM for Windows hosts  
+  _Example:_ `ansible_connection=winrm`
+- `ansible_winrm_transport`: Transport method (`basic`, `ntlm`, `kerberos`)  
+  _Example:_ `ansible_winrm_transport=basic`
+- `ansible_winrm_server_cert_validation`: Ignore self-signed certs  
+  _Example:_ `ansible_winrm_server_cert_validation=ignore`
+- `ansible_user`, `ansible_password`: WinRM credentials  
+  _Example:_ `ansible_user=Administrator`, `ansible_password=secret`
+- `ansible_port`: WinRM port (default: 5986 for HTTPS)  
+  _Example:_ `ansible_port=5986`
+
+### ✅ Network and Proxy Variables
+- `ansible_http_proxy`: HTTP proxy URL  
+  _Example:_ `ansible_http_proxy=http://proxy.example.com:8080`
+- `ansible_https_proxy`: HTTPS proxy URL  
+  _Example:_ `ansible_https_proxy=https://proxy.example.com:8443`
+- `ansible_no_proxy`: Comma-separated list of domains/IPs to skip proxy  
+  _Example:_ `ansible_no_proxy=localhost,127.0.0.1,.mydomain.com`
+
+### ✅ Facts and Custom Data
+- `ansible_python_interpreter`: Path to Python on the target  
+  _Example:_ `ansible_python_interpreter=/usr/bin/python3`
+- `ansible_shell_type`: Shell type (`sh`, `csh`)  
+  _Example:_ `ansible_shell_type=sh`
+- `ansible_env`: Dictionary of environment variables  
+  _Example:_ `ansible_env={"PATH": "/usr/local/bin:$PATH"}`
+- `ansible_inventory_hostname`: Inventory name  
+  _Example:_ Used automatically by Ansible
+- `ansible_distribution`: OS distribution (Ubuntu, CentOS, etc.)  
+  _Example:_ Fetched during fact gathering
+- `ansible_os_family`: OS family (RedHat, Debian, etc.)  
+  _Example:_ Used in conditionals in playbooks
+
+### ✅ Performance and Behavior Tuning
+- `ansible_timeout`: SSH connection timeout  
+  _Example:_ `ansible_timeout=30`
+- `ansible_shell_executable`: Shell path (e.g., `/bin/bash`)  
+  _Example:_ `ansible_shell_executable=/bin/bash`
+- `ansible_check_mode`: Dry-run mode flag  
+  _Example:_ Used internally by Ansible
+- `ansible_diff`: Show file diffs when changed  
+  _Example:_ `ansible_diff=true`
+- `ansible_gather_facts`: Set to `no` to disable fact gathering  
+  _Example:_ `ansible_gather_facts=no`
+"""
+

@@ -339,9 +339,7 @@ server1 ansible_host=192.168.1.100 ansible_user=ubuntu \
         ansible_become=true ansible_become_user=root
 ```
 ## Inventory variables
-# Extend markdown content to include examples for each group of variables
 
-markdown_with_examples = """
 ### ✅ Connection Variables (SSH/WinRM-related)
 - `ansible_host`: IP or hostname to connect to  
   _Example:_ `ansible_host=192.168.1.10`

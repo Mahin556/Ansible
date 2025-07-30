@@ -1,0 +1,14 @@
+all:
+  children:
+    Local_server:
+      hosts:
+        local_server:
+          ansible_connection: ssh
+          ansible_host: 192.168.29.109
+          ansible_port: 22
+    Server1:
+      hosts:
+        webserver:
+          ansible_connection: ssh
+          ansible_host: 192.168.29.43
+          ansible_port: 22

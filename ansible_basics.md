@@ -64,6 +64,7 @@ ansible-inventory -i inventory.ini --list --output output.json
 - Display your inventory in YAML format:
 ```
 ansible-inventory -i inventory.ini --list --yaml
+ansible-inventory -i ~/myinventory --list -y
 
 all:
  children:
@@ -659,7 +660,16 @@ Adding force_handlers = True in ansible.cfg
   tags: [always, deploy]
 
 ```
+### Playbook syntax check
+```
+ansible-playbook myplaybook.yml -i ~/myinventory --syntax
+ansible-playbook myplaybook.yml -i ~/myinventory --syntax-check
+```
 
+### Dry-run a playbook before fully executing
+```
+ansible-playbook myplaybook.yml -i ~/myinventory --check
+```
 
 
 ### Ansible Predefine Variables
@@ -1170,3 +1180,353 @@ your_playbook.yml: The playbook you are executing (or other arguments relevant t
   - ~/.ansible.cfg in the user's home directory: If the above are not found, Ansible looks here.
   - /etc/ansible/ansible.cfg: The default system-wide configuration file.
 - Using the --config option directly on the command line overrides all other configuration file locations for that specific command execution.
+
+
+### Ansible Configuration File Parameters with Examples
+
+#### [defaults]
+
+##### inventory
+- **Description:** Path to inventory file(s).
+- **Example:** `inventory = ./hosts`
+
+##### remote_user
+- **Description:** Default username to use for SSH connections.
+- **Example:** `remote_user = ansible`
+
+##### ask_pass
+- **Description:** Whether to prompt for the SSH password.
+- **Example:** `ask_pass = false`
+
+##### private_key_file
+- **Description:** Path to the SSH private key file.
+- **Example:** `private_key_file = ~/.ssh/id_rsa`
+
+##### host_key_checking
+- **Description:** Disable host key checking.
+- **Example:** `host_key_checking = false`
+
+##### timeout
+- **Description:** SSH connection timeout in seconds.
+- **Example:** `timeout = 30`
+
+##### forks
+- **Description:** Number of parallel processes.
+- **Example:** `forks = 5`
+
+##### log_path
+- **Description:** Path to the log file.
+- **Example:** `log_path = /var/log/ansible.log`
+
+##### roles_path
+- **Description:** Colon-separated list of directories to search for roles.
+- **Example:** `roles_path = ./roles:/etc/ansible/roles`
+
+##### library
+- **Description:** Colon-separated path to module libraries.
+- **Example:** `library = ./library`
+
+#### [privilege_escalation]
+
+##### become
+- **Description:** Enable privilege escalation.
+- **Example:** `become = true`
+
+##### become_method
+- **Description:** Method for privilege escalation (sudo, su, pbrun, etc.).
+- **Example:** `become_method = sudo`
+
+##### become_user
+- **Description:** User to become after login.
+- **Example:** `become_user = root`
+
+##### become_ask_pass
+- **Description:** Ask for privilege escalation password.
+- **Example:** `become_ask_pass = false`
+
+#### [ssh_connection]
+
+##### ssh_args
+- **Description:** Additional SSH arguments.
+- **Example:** `ssh_args = -o ControlMaster=auto -o ControlPersist=60s`
+
+##### control_path
+- **Description:** Path for SSH control socket.
+- **Example:** `control_path = ~/.ansible/cp/ansible-ssh-%%h-%%p-%%r`
+
+##### pipelining
+- **Description:** Enable pipelining to reduce SSH operations.
+- **Example:** `pipelining = true`
+
+##### scp_if_ssh
+- **Description:** Use SCP if SSH is used.
+- **Example:** `scp_if_ssh = true`
+
+
+
+#### Ansible CLI Parameters with Examples
+
+##### `-i`, `--inventory`
+Specify inventory host path or comma-separated host list.
+
+```bash
+ansible -i inventory.ini all -m ping
+```
+
+##### `-u`, `--user`
+Connect as this user (default: current user).
+
+```bash
+ansible all -m ping -u ubuntu
+```
+
+##### `-k`, `--ask-pass`
+Ask for SSH password.
+
+```bash
+ansible all -m ping -k
+```
+
+##### `--private-key`
+Use this private key file for SSH authentication.
+
+```bash
+ansible all -m ping --private-key ~/.ssh/id_rsa
+```
+
+##### `-m`, `--module-name`
+Name of the module to execute (default: command).
+
+```bash
+ansible all -m ping
+```
+
+##### `-a`, `--args`
+Arguments to pass to the module.
+
+```bash
+ansible all -m shell -a "uptime"
+```
+
+##### `-b`, `--become`
+Run operations with become (i.e., sudo).
+
+```bash
+ansible all -m apt -a "name=nginx state=present" -b
+```
+
+##### `--become-user`
+Run operations as this user (default: root).
+
+```bash
+ansible all -m command -a "whoami" -b --become-user=admin
+```
+
+##### `-K`, `--ask-become-pass`
+Ask for privilege escalation password.
+
+```bash
+ansible all -m ping -b -K
+```
+
+##### `-f`, `--forks`
+Specify number of parallel processes.
+
+```bash
+ansible all -m ping -f 20
+```
+
+##### `-l`, `--limit`
+Further limit selected hosts to an additional pattern.
+
+```bash
+ansible all -m ping -l webservers
+```
+
+##### `-t`, `--tags`
+Only run plays and tasks tagged with these values.
+
+```bash
+ansible-playbook site.yml -t setup
+```
+
+##### `--skip-tags`
+Skip tasks tagged with these values.
+
+```bash
+ansible-playbook site.yml --skip-tags "debug"
+```
+
+##### `--syntax-check`
+Perform a syntax check on the playbook.
+
+```bash
+ansible-playbook site.yml --syntax-check
+```
+
+##### `--check`
+Don’t make any changes; instead, try to predict some of the changes that may occur.
+
+```bash
+ansible-playbook site.yml --check
+```
+
+##### `--diff`
+When changing (small) files and templates, show the differences in those files.
+
+```bash
+ansible-playbook site.yml --check --diff
+```
+
+##### `--start-at-task`
+Start the playbook at the task matching this name.
+
+```bash
+ansible-playbook site.yml --start-at-task="Install Packages"
+```
+
+##### `--list-hosts`
+Outputs a list of matching hosts; does not execute anything else.
+
+```bash
+ansible webservers --list-hosts
+```
+
+##### `--list-tasks`
+List all tasks that would be executed.
+
+```bash
+ansible-playbook site.yml --list-tasks
+```
+
+##### `--list-tags`
+List all tags in the playbook.
+
+```bash
+ansible-playbook site.yml --list-tags
+```
+
+##### `-v`, `-vv`, `-vvv`, `-vvvv`
+Increase verbosity.
+
+```bash
+ansible-playbook site.yml -vvv
+```
+
+
+### Ansible Playbook Parameters
+
+#### name
+- **Description**: Name of the playbook or task
+- **Example**:
+```yaml
+- name: Install and start Apache
+  hosts: webservers
+```
+
+#### hosts
+- **Description**: Specifies the group or host on which the playbook will run
+- **Example**:
+```yaml
+  hosts: webservers
+```
+
+#### become
+- **Description**: Escalates privilege (typically to root)
+- **Example**:
+```yaml
+  become: yes
+```
+
+#### vars
+- **Description**: Defines variables within the playbook
+- **Example**:
+```yaml
+  vars:
+    http_port: 80
+```
+
+#### tasks
+- **Description**: List of tasks to execute
+- **Example**:
+```yaml
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+```
+
+#### roles
+- **Description**: List of roles to apply
+- **Example**:
+```yaml
+  roles:
+    - common
+    - webserver
+```
+
+#### handlers
+- **Description**: Used to trigger actions only when notified by tasks
+- **Example**:
+```yaml
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
+```
+
+#### notify
+- **Description**: Triggers handlers
+- **Example**:
+```yaml
+    notify:
+      - restart apache
+```
+
+#### gather_facts
+- **Description**: Enables or disables fact gathering
+- **Example**:
+```yaml
+  gather_facts: false
+```
+
+#### environment
+- **Description**: Set environment variables
+- **Example**:
+```yaml
+  environment:
+    PATH: "/opt/bin:/usr/bin"
+```
+
+#### tags
+- **Description**: Apply tasks based on specified tags
+- **Example**:
+```yaml
+  tags: install
+```
+
+#### when
+- **Description**: Conditional execution
+- **Example**:
+```yaml
+    when: ansible_os_family == "RedHat"
+```
+
+#### with_items
+- **Description**: Loops over a list of items
+- **Example**:
+```yaml
+    with_items:
+      - git
+      - curl
+```
+
+#### include_tasks / import_tasks
+- **Description**: Dynamically includes or statically imports another set of tasks
+- **Example**:
+```yaml
+    include_tasks: setup.yml
+```
+

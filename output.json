@@ -1,10 +1,33 @@
 {
+    "Local_server": {
+        "hosts": [
+            "local_server"
+        ]
+    },
+    "Server1": {
+        "hosts": [
+            "webserver"
+        ]
+    },
     "_meta": {
-        "hostvars": {}
+        "hostvars": {
+            "local_server": {
+                "ansible_connection": "ssh",
+                "ansible_host": "192.168.29.109",
+                "ansible_port": 22
+            },
+            "webserver": {
+                "ansible_connection": "ssh",
+                "ansible_host": "192.168.29.43",
+                "ansible_port": 22
+            }
+        }
     },
     "all": {
         "children": [
-            "ungrouped"
+            "ungrouped",
+            "Server1",
+            "Local_server"
         ]
     }
 }

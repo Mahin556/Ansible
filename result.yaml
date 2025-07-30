@@ -1,0 +1,15 @@
+---
+- name:
+  hosts: webservers, local_server
+  tasks:
+  - name:
+    setup:
+    register: result
+  - name:
+    debug:
+      var: result
+  - name: copy a file
+    delegate_to: localhost
+    copy:
+      content: "{{ result }}" 
+      dest: ./debug.txt

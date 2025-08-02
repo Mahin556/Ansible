@@ -1577,8 +1577,14 @@ ansible multi -m file -a "dest=/tmp/test mode=644 state=directory"
 ansible multi -m file -a "src=/src/symlink dest=/dest/symlink owner=root group=root state=link"
 ansible multi -m file -a "dest=/tmp/test state=absent"
 lineinfile, ini_file, unarchive
-
-
+ansible multi -s -a "tail /var/log/messages"
+ansible multi -s -m shell -a "tail /var/log/messages | grep ansible-command | wc -l"
+ansible multi -B 3600 -P 0 -a "/path/to/fire-and-forget-script.sh"
+ansible multi -s -B 3600 -a "yum -y update"
+ansible multi -s -m async_status -a "jid=763350539037"
+### To run a command in the background, you set the following options:
+   • -B <seconds>: the maximum amount of time (in seconds) to let the job run.
+   • -P <seconds>: the amount of time (in seconds) to wait between polling the servers for an updated job status.
 
 ```
 

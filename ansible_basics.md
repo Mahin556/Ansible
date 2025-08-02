@@ -1536,3 +1536,49 @@ ansible-playbook site.yml -vvv
     include_tasks: setup.yml
 ```
 
+### Points
+```
+The -s option (alias for --sudo) tells Ansible to run the command with sudo.
+-K (alias for --ask-sudo-pass), so you can enter your sudo password when Ansible needs it.
+
+ansible multi -a "hostname"
+ansible multi -a "hostname" -f 1
+ansible multi -a "df -h"
+ansible multi -a "free -m"
+ansible multi -a "date"
+ansible multi -s -m yum -a "name=ntp state=present"
+ansible multi -s -m service -a "name=ntpd state=started enabled=yes"
+ansible -m shell -a "date" multi
+ansible multi -s -a "service ntpd stop"
+ansible multi -s -a "ntpdate -q 0.rhel.pool.ntp.org"
+ansible multi -s -a "service ntpd start"
+ansible app -s -m yum -a "name=MySQL-python state=present"
+ansible app -s -m yum -a "name=python-setuptools state=present"
+ansible app -s -m easy_install -a "name=django" #Django is not in the official CentOS yum repository, but we can install it using Python’s
+                                                 easy_install (which, conveniently, has an Ansible module).
+ansible app -a "python -c 'import django; print django.get_version()'" #Make sure django install
+ansible db -s -m yum -a "name=mariadb-server state=present"
+ansible db -s -m service -a "name=mariadb state=started enabled=yes"
+ansible db -s -a "iptables -F"
+ansible db -s -a "iptables -A INPUT -s 192.168.60.0/24 -p tcp -m tcp --dport 3306 -j ACCEPT"
+ansible db -s -m yum -a "name=MySQL-python state=present"
+ansible db -s -m mysql_user -a "name=django host=% password=12345 priv=*.*:ALL state=present"
+ansible app -s -a "service ntpd status"
+ansible app -s -a "service ntpd restart" --limit "192.168.60.4" # (--limit) argument to limit the command to a specific host in the specified group.
+ansible app -s -a "service ntpd restart" --limit "*.4"
+ansible app -s -a "service ntpd restart" --limit ~".*\.4"
+ansible app -s -m group -a "name=admin state=present gid=[gid] system=yes"
+ansible app -s -m user -a "name=johndoe group=admin createhome=yes generate_ssh_key=yes uid=[uid] shell=[shell] password=[encrypted-password]"
+ansible app -s -m user -a "name=johndoe state=absent remove=yes"
+ansible multi -m stat -a "path=/etc/environment"
+ansible multi -m copy -a "src=/etc/hosts dest=/tmp/hosts"
+ansible multi -s -m fetch -a "src=/etc/hosts dest=/tmp flat=yes" # Only use flat=yes if you’re copying files from a single host.
+ansible multi -m file -a "dest=/tmp/test mode=644 state=directory"
+ansible multi -m file -a "src=/src/symlink dest=/dest/symlink owner=root group=root state=link"
+ansible multi -m file -a "dest=/tmp/test state=absent"
+lineinfile, ini_file, unarchive
+
+
+
+```
+

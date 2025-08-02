@@ -256,6 +256,7 @@ inventory = /path/to/your/inventory  # Replace with your inventoryfile path
 remote_user = your_remote_user      # Replace with your remote user
 host_key_checking = False          # Disable host key checking(use with caution)
 stdout_callback = yaml             # Use YAML for output
+vault_password_file = ./.vault_pass
 
 [privilege_escalation]
 become = True                      # Enable privilege escalation
@@ -903,6 +904,11 @@ ANSIBLE_CONFIG
 - Encrypt already created vault
 ```
 ansible-vault encrypt inventory
+```
+
+### Vault password file ENV
+```
+ANSIBLE_VAULT_PASSWORD_FILE=./.vault_pass
 ```
 
 - Example: Encrypt inventory.txt and save as enc_inven.txt:

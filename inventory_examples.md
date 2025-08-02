@@ -338,6 +338,11 @@ server1 ansible_host=192.168.1.100 ansible_user=ubuntu \
         ansible_python_interpreter=/usr/bin/python3 \
         ansible_become=true ansible_become_user=root
 ```
+### Ansible ENV for Inventory
+```
+ANSIBLE_HOSTS=/etc/ansible/hosts
+```
+
 ## Inventory variables
 
 ### ✅ Connection Variables (SSH/WinRM-related)

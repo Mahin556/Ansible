@@ -3,7 +3,9 @@
 ##### Copy a custom SSH Key
 - ssh-copy-id command
 ```
+
 ssh-copy-id -i ~/.ssh/ansible.pub vagrant@192.168.29.109
+ssh-copy-id -f "-o IdentityFile <PATH TO PEM FILE>" ubuntu@<INSTANCE-PUBLIC-IP> # TO EC2 Instance
 
 Default copy id_rsa.pub
 ```

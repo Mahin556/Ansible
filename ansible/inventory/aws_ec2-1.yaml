@@ -1,0 +1,7 @@
+---
+plugin: aws_ec2
+aws_access_key: <access_key> 
+aws_secret_key: <secret_access_key>
+groups:
+  - key: tags
+    prefix: tag

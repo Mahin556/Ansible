@@ -1,0 +1,16 @@
+---
+plugin: aws_ec2
+
+aws_access_key: <access_key>
+aws_secret_key: <secret_access_key>
+
+regions:
+  - ap-south-1
+
+keyed_groups:
+  - prefix: instance_type
+    key: instance_type
+  - key: placement.region
+    prefix: aws_region
+  - key: tags
+    prefix: tag

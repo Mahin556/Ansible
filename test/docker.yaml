@@ -1,0 +1,21 @@
+---
+- name: Add Docker official repository
+  hosts: all
+  gather_facts: true
+  become: true
+  vars:
+    supported_distros:
+      - CentOS
+      - RedHat
+      - Debian
+      - Ubuntu
+  tasks:
+    - name: Check if OS distribution is supported
+      fail:
+        msg: "{{ ansible_distribution }} is not supported by this playbook"
+      when: ansible_distribution not in supported_distros
+
+    - name: Initializing Docker role
+      include_role:
+        name: docker-role
+

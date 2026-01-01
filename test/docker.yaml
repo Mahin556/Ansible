@@ -10,12 +10,12 @@
       - Debian
       - Ubuntu
   tasks:
-    - name: Check if OS distribution is supported
+    - name: Validating OS.....
       fail:
         msg: "{{ ansible_distribution }} is not supported by this playbook"
       when: ansible_distribution not in supported_distros
 
-    - name: Initializing Docker role
+    - name: Initializing...
       include_role:
         name: docker-role
 

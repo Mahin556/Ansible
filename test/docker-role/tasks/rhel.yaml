@@ -6,14 +6,27 @@
     - curl
     state: present
 
-- name: Add Docker yum repository
-  yum_repository:
-    name: docker-ce
-    description: Docker CE Stable - $basearch
-    baseurl: https://download.docker.com/linux/rhel/docker-ce.repo
-    enabled: yes
-    gpgcheck: yes
-    gpgkey: https://download.docker.com/linux/rhel/gpg
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/rhel/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+  become: true
+
+- name: Enable Docker Edge repo
+  ini_file:
+    dest: /etc/yum.repos.d/docer-ce.repo
+    section: 'docker-ce-edge'
+    option: enabled
+    value: 0
+  become: true
+
+- name: Enable Docker Test repo
+  ini_file:
+    dest: /etc/yum.repos.d/docer-ce.repo
+    section: 'docker-ce-test'
+    option: enabled
+    value: 0
+  become: true
 
 - name: Clean yum cache
   command: dnf clean all
@@ -25,15 +38,14 @@
 
 - name: Installing Docker Engine...
   dnf:
-    name: {{ item }}
+    name: 
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
     state: present
-  loop:
-  - docker-ce 
-  - docker-ce-cli 
-  - containerd.io 
-  - docker-buildx-plugin 
-  - docker-compose-plugin
-
+    
 - name: Starting and enabling Docker service...
   systemd:
     name: docker

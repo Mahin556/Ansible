@@ -10,7 +10,7 @@
   get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docer-ce.repo
-  become: yes
+  become: true
 
 - name: Enable Docker Edge repo
   ini_file:
@@ -18,7 +18,7 @@
     section: 'docker-ce-edge'
     option: enabled
     value: 0
-  become: yes
+  become: true
 
 - name: Enable Docker Test repo
   ini_file:
@@ -26,7 +26,7 @@
     section: 'docker-ce-test'
     option: enabled
     value: 0
-  become: yes
+  become: true
 
 - name: Clean yum cache
   command: dnf clean all

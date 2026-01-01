@@ -42,14 +42,13 @@
 
 - name: Installing Docker Engine...
   apt:
-    name: "{{ item }}"
+    name: 
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
     state: present
-  loop:
-  - docker-ce 
-  - docker-ce-cli 
-  - containerd.io 
-  - docker-buildx-plugin 
-  - docker-compose-plugin
 
 - name: Starting and enabling Docker service...
   systemd:

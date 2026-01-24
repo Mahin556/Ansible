@@ -1,5 +1,0 @@
----
-# tasks file for docker-role
-- name: Configuring.....
-  include_tasks: "{{ ansible_distribution | lower }}.yaml"
-

@@ -1,0 +1,17 @@
+This is a system validation as {{ ansible_date_time.date }} {{ ansible_date_time.time }}
+
+Unreachable systems:
+----------------------------------------------
+{% for host in ansible_play_hosts_all %}
+{% if host not in ansible_play_hosts %}
+- {{ host }}
+{% endif %}
+{% endfor %}
+
+Hosts that have been up longer than a day:
+----------------------------------------------
+{% for host in ansible_play_hosts %}
+{% if hostvars[host].ansible_uptime_seconds is defined and hostvars[host].ansible_uptime_seconds > 60 %}
+- {{ hostvars[host].ansible_hostname | default(host) }} (uptime: {{ hostvars[host].ansible_uptime_seconds // 60 }} minutes)
+{% endif %}
+{% endfor %}

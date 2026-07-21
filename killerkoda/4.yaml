@@ -1,0 +1,22 @@
+---
+- name: Call API and get results from a webpage
+  hosts: localhost
+  vars:
+  gather_facts: True
+  become: False
+  tasks:
+
+    - name: Pulling SWAPI and get results from the webpage
+      uri:
+        url: https://swapi.dev/api/people/
+        return_content: yes
+        validate_certs: false
+      register: swapi_results
+      
+    - name: Debug variables to view contents
+      debug:
+        var: swapi_results
+
+    - name: Content
+      debug:
+        msg: "{{ swapi_results.content }}"

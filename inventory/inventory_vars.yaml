@@ -1,0 +1,29 @@
+
+- name: Show inventory hostname
+  debug:
+    msg: "{{ inventory_hostname }}"
+
+- name: Show short hostname
+  debug:
+    msg: "{{ inventory_hostname.split('.')[0] }}"
+
+- name: Show host IP
+  debug:
+    msg: "{{ ansible_host }}"
+
+- name: Show host IP
+  debug:
+    msg: "{{ hostvars[inventory_hostname].ansible_host }}"
+
+- name: Show all etcd nodes
+  debug:
+    msg: "{{ groups['etcd'] }}"
+
+- name: Show etcd node IPs
+  debug:
+    msg: "{{ hostvars[item].ansible_host }}"
+  loop: "{{ groups['etcd'] }}"
+
+- name: Show default IPv4
+  debug:
+    msg: "{{ ansible_default_ipv4.address }}"

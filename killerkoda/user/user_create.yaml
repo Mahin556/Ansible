@@ -1,0 +1,35 @@
+---
+- name: Creating a new users on environment servers
+  hosts: servers
+  gather_facts: true
+  become: true
+  vars:
+  tasks:
+    - name: Debug the environment variable
+      debug:
+        msg: "The environment is set to {{ env }}"
+
+    - name: Creating a new user on production servers
+      ansible.builtin.user:
+        name: prod_engineer
+        state: present
+        comment: Prod engineer
+        shell: /bin/bash
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/id_ed25519
+        ssh_key_type: ed25519
+      when: '"prod" in env'
+
+    - name: Creating a new user on development servers
+      ansible.builtin.user:
+        name: dev_engineer
+        state: present
+        comment: Dev engineer
+        groups: admin
+        shell: /bin/bash
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/id_ed25519
+        ssh_key_type: ed25519
+      when: '"dev" in env'

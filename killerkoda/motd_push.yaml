@@ -1,0 +1,20 @@
+---
+- hosts: servers
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Debug the environment variable
+      debug:
+        msg: "The environment is set to {{ env }}"
+
+    - name: Pushing motd to production servers
+      copy:
+        src: /root/prod_motd
+        dest: /etc/motd
+      when: '"prod" in env'
+
+    - name: Pushing motd to development servers
+      copy:
+        src: /root/dev_motd
+        dest: /etc/motd
+      when: '"dev" in env'

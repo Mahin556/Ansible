@@ -1,0 +1,25 @@
+---
+- name: Package install for environment
+  hosts: servers
+  gather_facts: trye
+  become: true
+  tasks:
+  - name: Debug env variables just to see them
+    debug:
+      var: app
+      
+  - name: Install apache2 on the web server
+    apt:
+      pkg:
+      - apache2
+      - php
+      state: present
+    when: '"web" in app'
+  
+  - name: Install mariadb on the db server
+    apt:
+      pkg: 
+      - mariadb-server
+      - mariadb-client
+      state: present
+    when: '"db" in app'

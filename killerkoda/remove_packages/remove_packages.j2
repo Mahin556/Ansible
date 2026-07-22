@@ -1,0 +1,34 @@
+This is a system validation as {{ ansible_date_time.date }} {{ ansible_date_time.time }}
+
+Unreachable systems:
+----------------------------------------------
+{% for host in ansible_play_hosts_all %}
+{% if host not in ansible_play_hosts %}
+- {{ host }}
+{% endif %}
+{% endfor %}
+
+Removed packages:
+----------------------------------------------
+{% for host in ansible_play_hosts_all %}
+###### {{ host }}({{ hostvars[host].ansible_os_family | lower }}) ######
+{% set os_family = hostvars[host].ansible_os_family | lower %}
+{% set var_name = "verify_removal_" + os_family %}
+{% if var_name in hostvars[host] %}
+{% set removal_results = hostvars[host][var_name].results | default([]) %}
+{% if removal_results | length > 0 %}
+{% for package in removal_results %}
+{% if package.rc == 0 %}
+✅ {{ package.item }} was removed successfully
+{% else %}
+❌ {{ package.item }} failed to remove (rc: {{ package.rc }})
+{% endif %}
+{% endfor %}
+{% else %}
+(No packages were processed on this host)
+{% endif %}
+{% else %}
+⚠️ NOT APPLICABLE (verification removal task did not run)
+{% endif %}
+
+{% endfor %}

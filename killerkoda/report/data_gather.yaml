@@ -1,0 +1,11 @@
+---
+
+- name: Data Gather Playbook
+  hosts: servers
+  vars:
+  gather_facts: True
+  become: True
+  tasks:
+
+  roles:
+  - data_gather

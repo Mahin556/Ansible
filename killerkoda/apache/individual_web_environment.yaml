@@ -1,0 +1,83 @@
+---
+# Required variables:
+# deploy = present or absent
+# env = test or qa or dev
+# port = 8080 or 8081 or 8082 (must match defined spec given by teams)
+# command = ansible-playbook -i /root/hosts /root/individual_web_environment.yaml --extra-vars "deploy=absent env=test port=8081"
+- name: Web Environment
+  hosts: webservers
+  vars:
+  gather_facts: True
+  become: True
+  tasks:
+  - name: Install apache2 on the web server
+    apt:
+      name: apache2
+      state: present
+
+  - name: Block for Present deploy State
+    when: deploy == "present"
+    block:
+
+    - name: Create directories for environment
+      file:
+        path: "/var/www/html_{{ env}}"
+        state: directory
+      notify:
+        - Restart apache2
+
+    - name: Add the Listener ports to /etc/apache2/ports.conf
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        state: present
+        line: "Listen {{ port }}"
+        insertafter: "^Listen"
+      notify:
+        - Restart apache2
+
+    - name: Push the Virtual Directives files into the correct place
+      copy:
+        src: "{{ env }}_virtual_host.conf"
+        dest: "/etc/apache2/sites-available/{{ env }}_virtual_host.conf"
+      notify:
+        - Restart apache2
+
+    - name: Push the html for each page over
+      copy:
+        src: "{{ env }}_index.html"
+        dest: "/var/www/html_{{ env }}/index.html"
+      notify:
+        - Restart apache
+
+  - name: Block for Absent deploy State
+    when: deploy == "absent"
+    block:
+
+    - name: Delete directories for environment
+      file:
+        path: "/var/www/html_{{ env}}"
+        state: absent
+      notify:
+        - Restart apache2
+
+    - name: Remove the Listener ports from /etc/apache2/ports.conf
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        state: absent
+        line: "Listen {{ port }}"
+        insertafter: "^Listen"
+      notify:
+        - Restart apache2
+
+    - name: Remove the Virtual Directives files from the correct place
+      file:
+        path: "/etc/apache2/sites-available/{{ env }}_virtual_host.conf"
+        state: absent
+      notify:
+        - Restart apache2
+
+  handlers:
+  - name: Restart apache
+    systemd:
+      state: restarted
+      name: apache2

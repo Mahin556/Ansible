@@ -1,0 +1,45 @@
+---
+- name: System Facts and Group by those facts
+  hosts: servers
+  vars:
+  gather_facts: True
+  become: True
+  tasks:
+
+    - name: Show groups active at the start of the playbook
+      ansible.builtin.debug:
+        msg: "{{ group_names }}"
+
+    - name: Setting groups for rebootgroup
+      ansible.builtin.group_by:
+        key: "{{ ansible_local.patching.patch_group }}"
+      failed_when: false
+
+    - name: Checking Rebooting flag
+      ansible.builtin.group_by:
+        key: Rebooting
+      when: '"true" in ansible_local.patching.Rebooting'
+
+    - name: Group by patching group
+      ansible.builtin.group_by:
+        key: "{{ ansible_local.patching.patch_group }}"
+      when: ansible_local.patching.patch_group is defined
+
+    - name: Group by appserver
+      ansible.builtin.group_by:
+        key: "appserver"
+      when: ansible_local.patching.appserver is defined and 'true' in ansible_local.patching.appserver
+
+    - name: Group by dbserver
+      ansible.builtin.group_by:
+        key: "database"
+      when: ansible_local.patching.dbserver is defined and 'true' in ansible_local.patching.dbserver
+
+    - name: Group by webserver
+      ansible.builtin.group_by:
+        key: "webserver"
+      when: ansible_local.patching.webserver is defined and 'true' in ansible_local.patching.webserver
+
+    - name: Show groups active at the end of the playbook
+      ansible.builtin.debug:
+        msg: "{{ group_names }}"

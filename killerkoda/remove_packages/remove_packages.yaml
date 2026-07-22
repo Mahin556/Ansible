@@ -1,0 +1,72 @@
+---
+- name: Package removal for environment
+  hosts: servers
+  gather_facts: true
+  become: true
+  vars: {}   # or remove this line entirely
+
+  tasks:
+    - name: Remove Apps for security reasons (Debian/Ubuntu)
+      apt:
+        pkg:
+          - bzip2
+          - containerd
+        state: absent
+        purge: yes
+      register: remove_packages_debian
+      when: ansible_os_family == "Debian"   # skip on non-Debian
+
+    - name: Remove Apps (RedHat/CentOS)
+      package:
+        name: [bzip2, containerd]
+        state: absent
+      register: remove_packages_redhat    # ← unique name
+      when: ansible_os_family == "RedHat"
+
+    - name: Show Debian removal result
+      debug:
+        var: remove_packages_debian
+      when: ansible_os_family == "Debian"
+
+    - name: Show RedHat removal result
+      debug:
+        var: remove_packages_redhat
+      when: ansible_os_family == "RedHat"
+
+    - name: Verify the removal of packages (Debian)
+      shell: "dpkg -l | grep -i {{ item }} || true"
+      loop:
+        - bzip2
+        - containerd
+      failed_when: false
+      register: verify_removal_debian
+      when: ansible_os_family == "Debian"
+
+    - name: Verify the removal of packages (RedHat)
+      shell: "rpm -qa | grep -i {{ item }} || true"
+      loop:
+        - bzip2
+        - containerd
+      failed_when: false
+      register: verify_removal_redhat
+      when: ansible_os_family == "RedHat"
+
+    - name: Debug verify_removal_debian
+      debug:
+        var: verify_removal_debian
+
+    - name: Debug verify_removal_redhat
+      debug:
+        var: verify_removal_redhat
+
+    - name: Gather localhost facts (for date/time)
+      setup:
+      delegate_to: localhost
+      run_once: true
+
+    - name: Report out all removals to the control node
+      template:
+        src: /root/remove_packages1.j2
+        dest: "/root/remove_packages_report.{{ ansible_date_time.iso8601_basic_short }}.txt"
+      delegate_to: localhost
+      run_once: true
